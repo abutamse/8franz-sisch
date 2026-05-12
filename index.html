@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klett Français · Vocabulaire Quiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #24242f;
+    --accent: #4a9ef7;
+    --accent2: #f7a26a;
+    --accent3: #6af7b8;
+    --text: #eef4ff;
+    --muted: #7a8aaa;
+    --correct: #4cdb8a;
+    --wrong: #f76a6a;
+    --border: rgba(74,158,247,0.2);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(74,158,247,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .app { width: 100%; max-width: 680px; position: relative; }
+
+  .screen { display: none; animation: fadeIn 0.35s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 32px;
+    opacity: 0.8;
+  }
+
+  .home-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .home-sub { text-align: center; color: var(--muted); font-size: 15px; margin-bottom: 40px; }
+
+  .section-grid { display: grid; gap: 10px; }
+
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-card:hover { background: var(--surface2); border-color: rgba(74,158,247,0.5); transform: translateX(4px); }
+  .section-card .sc-left { display: flex; flex-direction: column; gap: 4px; }
+  .section-card .sc-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .section-card .sc-name { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+  .section-card .sc-count { font-size: 13px; color: var(--muted); }
+  .section-card .arrow { color: var(--accent); font-size: 20px; opacity: 0.6; }
+
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .quiz-back {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer; transition: all 0.2s;
+  }
+  .quiz-back:hover { background: var(--surface2); }
+
+  .quiz-stats { display: flex; gap: 12px; align-items: center; }
+  .stat-pill {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 5px 12px; font-size: 13px; font-weight: 500;
+  }
+  .stat-pill.correct-stat { color: var(--correct); border-color: rgba(76,219,138,0.3); }
+  .stat-pill.wrong-stat { color: var(--wrong); border-color: rgba(247,106,106,0.3); }
+
+  .progress-bar { height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 32px; }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px; transition: width 0.4s ease;
+  }
+
+  .quiz-section-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+
+  .question-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 32px; margin-bottom: 20px;
+  }
+  .question-num { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+
+  .mode-badge {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
+  }
+  .mode-badge.mc { background: rgba(74,158,247,0.18); color: #6bb4f9; border: 1px solid rgba(74,158,247,0.35); }
+  .mode-badge.text { background: rgba(247,162,106,0.18); color: #f7a26a; border: 1px solid rgba(247,162,106,0.35); }
+
+  .question-text {
+    font-family: 'Syne', sans-serif; font-size: clamp(1.2rem, 3vw, 1.6rem); font-weight: 700; line-height: 1.3;
+  }
+
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .options-grid { grid-template-columns: 1fr; } }
+
+  .option-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    border-radius: 12px; padding: 14px 18px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; cursor: pointer; transition: all 0.18s ease; text-align: left;
+  }
+  .option-btn:hover:not(:disabled) { background: var(--surface2); border-color: var(--accent); transform: translateY(-1px); }
+  .option-btn.correct { background: rgba(76,219,138,0.15); border-color: var(--correct); color: var(--correct); }
+  .option-btn.wrong { background: rgba(247,106,106,0.12); border-color: var(--wrong); color: var(--wrong); }
+  .option-btn:disabled { cursor: default; }
+
+  .text-input-wrap { display: flex; gap: 10px; flex-wrap: wrap; }
+  .text-input {
+    flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    border-radius: 12px; padding: 14px 18px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; outline: none; transition: border-color 0.2s; min-width: 200px;
+  }
+  .text-input:focus { border-color: var(--accent); }
+  .text-input.correct { border-color: var(--correct); background: rgba(76,219,138,0.1); }
+  .text-input.wrong { border-color: var(--wrong); background: rgba(247,106,106,0.08); }
+  .text-input:disabled { opacity: 0.7; cursor: default; }
+
+  .submit-btn {
+    background: var(--accent); border: none; color: white; border-radius: 12px;
+    padding: 14px 24px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em;
+  }
+  .submit-btn:hover { background: #6bb4f9; transform: translateY(-1px); }
+
+  .feedback {
+    margin-top: 14px; padding: 12px 18px; border-radius: 10px; font-size: 14px;
+    font-weight: 500; display: none;
+  }
+  .feedback.show { display: block; animation: fadeIn 0.2s; }
+  .feedback.correct { background: rgba(76,219,138,0.12); color: var(--correct); border: 1px solid rgba(76,219,138,0.3); }
+  .feedback.wrong { background: rgba(247,106,106,0.1); color: var(--wrong); border: 1px solid rgba(247,106,106,0.25); }
+
+  .next-btn {
+    width: 100%; margin-top: 12px;
+    background: linear-gradient(135deg, var(--accent), #6bb4f9);
+    border: none; color: white; border-radius: 12px; padding: 15px;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; display: none; transition: opacity 0.2s; letter-spacing: 0.04em;
+  }
+  .next-btn:hover { opacity: 0.9; }
+  .next-btn.show { display: block; animation: fadeIn 0.3s; }
+
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+    padding: 40px 32px; text-align: center;
+  }
+  .result-emoji { font-size: 64px; margin-bottom: 16px; }
+  .result-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+  .result-sub { color: var(--muted); margin-bottom: 32px; }
+  .result-score {
+    font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 24px;
+  }
+  .result-details { display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; }
+  .result-detail { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .rd-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
+  .rd-label { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .rd-correct .rd-num { color: var(--correct); }
+  .rd-wrong .rd-num { color: var(--wrong); }
+
+  .restart-btn {
+    background: var(--accent); border: none; color: white; border-radius: 12px;
+    padding: 14px 32px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; margin: 6px; transition: all 0.2s;
+  }
+  .restart-btn:hover { background: #6bb4f9; }
+  .home-btn {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 12px; padding: 14px 32px; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer; margin: 6px; transition: all 0.2s;
+  }
+  .home-btn:hover { background: var(--surface); }
+
+  .direction-toggle {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 5px; margin-bottom: 28px; width: fit-content;
+    margin-left: auto; margin-right: auto;
+  }
+  .dir-btn {
+    border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; padding: 8px 18px; border-radius: 10px; cursor: pointer;
+    transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
+  }
+  .dir-btn.active { background: var(--accent); color: white; font-weight: 600; }
+  .dir-btn:not(.active):hover { color: var(--text); }
+
+  .quiz-dir-badge {
+    font-size: 11px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 20px; padding: 3px 10px; margin-left: 8px; letter-spacing: 0.05em;
+  }
+
+  .sc-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+  .sc-badge { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600; letter-spacing: 0.04em; }
+  .sc-badge.perfect { background: rgba(76,219,138,0.18); color: #4cdb8a; border: 1px solid rgba(76,219,138,0.35); }
+  .sc-badge.done { background: rgba(74,158,247,0.18); color: #6bb4f9; border: 1px solid rgba(74,158,247,0.35); }
+  .sc-badge.errors { background: rgba(247,162,106,0.18); color: #f7a26a; border: 1px solid rgba(247,162,106,0.35); }
+
+  .result-perfect-banner {
+    background: linear-gradient(135deg, rgba(76,219,138,0.2), rgba(76,219,138,0.05));
+    border: 1px solid rgba(76,219,138,0.4); border-radius: 12px; padding: 12px 20px;
+    color: #4cdb8a; font-weight: 600; font-size: 15px; margin-bottom: 20px; display: none;
+  }
+  .result-perfect-banner.show { display: block; animation: fadeIn 0.4s; }
+  .result-prev { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .result-prev span { color: var(--text); font-weight: 600; }
+
+  .stats-btn {
+    position: fixed; bottom: 20px; right: 20px; background: var(--surface);
+    border: 1px solid var(--border); color: var(--text); border-radius: 50%;
+    width: 48px; height: 48px; font-size: 20px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .stats-btn:hover { background: var(--surface2); border-color: var(--accent); }
+
+  .stats-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .stats-overlay.open { display: flex; animation: fadeIn 0.2s; }
+  .stats-modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 28px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+  }
+  .stats-modal h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+  .stats-modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .stats-close { float: right; background: var(--surface2); border: none; color: var(--text); border-radius: 8px; padding: 5px 12px; cursor: pointer; font-size: 14px; }
+  .stats-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+  .stats-row:last-child { border-bottom: none; }
+  .stats-row-left { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .stats-row-label { font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+  .stats-row-name { font-size: 14px; font-weight: 500; }
+  .stats-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .stats-score-big { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; }
+  .stats-score-big.green { color: var(--correct); }
+  .stats-score-big.orange { color: var(--accent2); }
+  .stats-score-big.red { color: var(--wrong); }
+  .stats-attempts { font-size: 12px; color: var(--muted); }
+  .stats-empty { text-align: center; color: var(--muted); padding: 30px; font-size: 14px; }
+  .stats-reset-btn { width: 100%; margin-top: 16px; background: transparent; border: 1px solid rgba(247,106,106,0.3); color: var(--wrong); border-radius: 10px; padding: 10px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .stats-reset-btn:hover { background: rgba(247,106,106,0.1); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div class="screen active" id="homeScreen">
+    <div class="logo">Klett · Français · Vocabulaire Quiz</div>
+    <div class="home-title">Prêt à<br>apprendre? 🇫🇷</div>
+    <div class="home-sub">Choisis une unité pour t'entraîner</div>
+    <div class="direction-toggle">
+      <button class="dir-btn active" id="dirFR" onclick="setDir('fr')">🇫🇷 FR → DE</button>
+      <button class="dir-btn" id="dirDE" onclick="setDir('de')">🇩🇪 DE → FR</button>
+    </div>
+    <div class="section-grid" id="sectionGrid"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quizScreen">
+    <div class="quiz-header">
+      <button class="quiz-back" onclick="goHome()">← Zurück</button>
+      <div class="quiz-stats">
+        <span class="stat-pill correct-stat" id="correctCount">✓ 0</span>
+        <span class="stat-pill wrong-stat" id="wrongCount">✗ 0</span>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="quiz-section-label" id="quizSectionLabel"></div>
+    <div class="question-card">
+      <div class="question-num" id="questionNum"></div>
+      <div class="question-text" id="questionText"></div>
+    </div>
+    <div id="answersArea"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Suivant →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="resultScreen">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-title" id="resultTitle">Bravo!</div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-perfect-banner" id="perfectBanner">🌟 Perfekte Runde – kein einziger Fehler!</div>
+      <div class="result-score" id="resultScore">0%</div>
+      <div class="result-prev" id="resultPrev"></div>
+      <div class="result-details">
+        <div class="result-detail rd-correct"><div class="rd-num" id="finalCorrect">0</div><div class="rd-label">Richtig</div></div>
+        <div class="result-detail rd-wrong"><div class="rd-num" id="finalWrong">0</div><div class="rd-label">Falsch</div></div>
+        <div class="result-detail"><div class="rd-num" id="finalTotal">0</div><div class="rd-label">Gesamt</div></div>
+      </div>
+      <div>
+        <button class="restart-btn" onclick="restartQuiz()">Nochmal</button>
+        <button class="home-btn" onclick="goHome()">Alle Unités</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button class="stats-btn" onclick="openStats()" title="Fortschritt">📊</button>
+
+<div class="stats-overlay" id="statsOverlay" onclick="closeStatsOutside(event)">
+  <div class="stats-modal" id="statsModal">
+    <button class="stats-close" onclick="closeStats()">✕ Schließen</button>
+    <h2>Dein Fortschritt</h2>
+    <div class="stats-modal-sub">Alle abgeschlossenen Unités</div>
+    <div id="statsContent"></div>
+    <button class="stats-reset-btn" onclick="resetStats()">🗑 Fortschritt zurücksetzen</button>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    id: "u1", label: "Unité 1", name: "Motivés?", color: "#4a9ef7",
+    questions: [
+      {q:"être motivé(e)", a:"motiviert sein", wrong:["begeistert sein","beschäftigt sein","glücklich sein"]},
+      {q:"revenir", a:"zurückkommen", wrong:["vorbeikommen","ankommen","weggehen"]},
+      {q:"être de bonne humeur", a:"gute Laune haben", wrong:["schlechte Laune haben","müde sein","aufgeregt sein"]},
+      {q:"un concours", a:"ein Wettbewerb", wrong:["ein Kurs","ein Projekt","eine Prüfung"]},
+      {q:"un stage", a:"ein Praktikum / ein Kurs", wrong:["ein Urlaub","eine Bühne","ein Wettbewerb"]},
+      {q:"le karaté", a:"das Karate", wrong:["das Judo","das Boxen","das Ringen"]},
+      {q:"un auteur / une auteure", a:"ein Autor / eine Autorin", wrong:["ein Lehrer","ein Dichter","ein Regisseur"]},
+      {q:"une colonie de vacances", a:"ein Ferienlager", wrong:["eine Ferienreise","ein Sommerkurs","eine Urlaubskolonie"]},
+      {q:"la montagne", a:"der Berg / das Gebirge", wrong:["das Meer","die Küste","die Ebene"]},
+      {q:"jouer de qc", a:"etw. spielen (ein Instrument)", wrong:["etw. benutzen","etw. ausprobieren","etw. üben"]},
+      {q:"la liberté", a:"die Freiheit", wrong:["die Gleichheit","die Gerechtigkeit","die Unabhängigkeit"]},
+      {q:"reprendre qc", a:"etw. wieder aufnehmen", wrong:["etw. vergessen","etw. beenden","etw. abgeben"]},
+      {q:"une pêche", a:"ein Pfirsich", wrong:["eine Birne","eine Pflaume","eine Aprikose"]},
+      {q:"donner la pêche à qn", a:"jdn. aufmuntern", wrong:["jdn. nerven","jdn. bestrafen","jdn. ignorieren"]},
+      {q:"ne … pas du tout", a:"überhaupt nicht", wrong:["gar nicht mehr","nie wieder","kaum noch"]},
+      {q:"croire qc", a:"etw. glauben", wrong:["etw. sagen","etw. wissen","etw. vermuten"]},
+      {q:"rire", a:"lachen", wrong:["lächeln","weinen","schreien"]},
+      {q:"offrir", a:"jdm. etw. anbieten / schenken", wrong:["nehmen","kaufen","verlangen"]},
+      {q:"réussir", a:"Erfolg haben / erfolgreich sein", wrong:["scheitern","versuchen","kämpfen"]},
+      {q:"un succès", a:"ein Erfolg", wrong:["ein Misserfolg","ein Versuch","ein Ziel"]},
+      {q:"l'argent (m.)", a:"das Geld", wrong:["das Silber","die Münze","der Reichtum"]},
+      {q:"rester assis(e)", a:"sitzen bleiben", wrong:["aufstehen","weggehen","schlafen"]},
+      {q:"prendre l'air", a:"an die frische Luft gehen", wrong:["atmen","fliegen","rennen"]},
+      {q:"imaginer qc", a:"sich etw. vorstellen", wrong:["etw. erfinden","etw. träumen","etw. vergessen"]},
+      {q:"l'énergie (f.)", a:"die Energie", wrong:["die Kraft","die Ausdauer","die Stärke"]},
+      {q:"un entraînement", a:"ein Training", wrong:["ein Wettkampf","eine Übung","ein Kurs"]},
+      {q:"au moins", a:"mindestens / wenigstens", wrong:["höchstens","ungefähr","fast"]},
+      {q:"risquer de faire qc", a:"Gefahr laufen, etw. zu tun", wrong:["etw. vermeiden","etw. wagen","etw. versuchen"]},
+      {q:"arrêter (de faire qc)", a:"aufhören (etw. zu tun)", wrong:["anfangen","weitermachen","vergessen"]},
+      {q:"mieux (adv.)", a:"besser (Adv.)", wrong:["mehr","weniger","schneller"]},
+      {q:"l'enfer (m.)", a:"die Hölle", wrong:["der Himmel","das Paradies","der Abgrund"]},
+      {q:"créer qc", a:"etw. gründen / erschaffen", wrong:["etw. kaufen","etw. zerstören","etw. suchen"]},
+      {q:"un groupe", a:"hier: eine Band", wrong:["eine Gruppe","ein Verein","ein Team"]},
+      {q:"n'importe quoi", a:"irgendetwas / hier: Unsinn", wrong:["alles","nichts","etwas Wichtiges"]},
+      {q:"réaliser qc", a:"etw. realisieren / verwirklichen", wrong:["etw. träumen","etw. planen","etw. aufgeben"]},
+      {q:"un projet", a:"ein Projekt", wrong:["ein Plan","ein Vorhaben","ein Thema"]},
+      {q:"s'occuper de qn/qc", a:"sich mit jdm./etw. beschäftigen", wrong:["jdn. ignorieren","etw. vermeiden","etw. vergessen"]},
+      {q:"une annonce", a:"eine Anzeige / eine Annonce", wrong:["eine Nachricht","ein Brief","ein Bericht"]},
+      {q:"changer qc", a:"etw. ändern / wechseln", wrong:["etw. behalten","etw. kaufen","etw. verlieren"]},
+      {q:"motiver qn", a:"jdn. motivieren", wrong:["jdn. belohnen","jdn. bestrafen","jdn. loben"]},
+      {q:"partager qc", a:"etw. teilen", wrong:["etw. kaufen","etw. behalten","etw. verleihen"]},
+      {q:"un numéro", a:"eine Nummer / eine Ausgabe", wrong:["eine Seite","ein Kapitel","ein Titel"]},
+      {q:"stresser", a:"(sich) stressen", wrong:["entspannen","beruhigen","ausruhen"]},
+      {q:"le bac", a:"das Abitur", wrong:["das Zeugnis","die Prüfung","der Abschluss"]},
+      {q:"mentir", a:"lügen", wrong:["sprechen","sagen","zugeben"]},
+      {q:"rien ne …", a:"nichts …", wrong:["niemand","alles","etwas"]},
+      {q:"personne ne …", a:"niemand …", wrong:["jemand","alle","keiner"]},
+      {q:"enfermer qn/qc", a:"jdn./etw. einschließen", wrong:["befreien","öffnen","zeigen"]},
+      {q:"rappeler qn/qc à qn", a:"jdn. an jdn./etw. erinnern", wrong:["jdn. anrufen","jdn. vorstellen","jdn. vergessen"]},
+      {q:"un refrain", a:"ein Refrain", wrong:["ein Vers","eine Strophe","ein Lied"]},
+      {q:"juste", a:"nur / bloß", wrong:["genau","wirklich","fast"]},
+      {q:"servir à qc", a:"zu etw. nützen / dienen", wrong:["etw. servieren","etw. bringen","etw. kochen"]},
+      {q:"ne … pas non plus", a:"auch nicht", wrong:["auch","trotzdem nicht","gar nicht"]},
+      {q:"à mon avis", a:"meiner Meinung nach", wrong:["zum Glück","leider","normalerweise"]},
+      {q:"c'est pourquoi", a:"deshalb", wrong:["deshalb","obwohl","trotzdem"]},
+      {q:"seulement", a:"nur", wrong:["vielleicht","manchmal","immer"]},
+      {q:"un dîner", a:"ein Abendessen", wrong:["ein Mittagessen","ein Frühstück","ein Snack"]},
+    ]
+  },
+  {
+    id: "u2", label: "Unité 2", name: "Soupçons", color: "#f76a9a",
+    questions: [
+      {q:"un soupçon", a:"ein Verdacht", wrong:["eine Überraschung","ein Geheimnis","ein Problem"]},
+      {q:"un livre pour la jeunesse", a:"ein Jugendbuch", wrong:["ein Kinderbuch","ein Roman","ein Schulbuch"]},
+      {q:"un objet", a:"ein Gegenstand", wrong:["ein Ding","ein Artikel","ein Produkt"]},
+      {q:"un regard", a:"ein Blick", wrong:["ein Blick","ein Blickkontakt","eine Ansicht"]},
+      {q:"une coiffure", a:"eine Frisur", wrong:["eine Mütze","ein Hut","ein Haarschnitt"]},
+      {q:"accepter qn/qc", a:"jdn./etw. akzeptieren / annehmen", wrong:["ablehnen","ignorieren","vergessen"]},
+      {q:"une couverture", a:"eine Decke / hier: ein Umschlag", wrong:["ein Einband","ein Titel","ein Cover"]},
+      {q:"un voleur / une voleuse", a:"ein Dieb / eine Diebin", wrong:["ein Räuber","ein Betrüger","ein Einbrecher"]},
+      {q:"un système", a:"ein System", wrong:["eine Methode","eine Regel","eine Ordnung"]},
+      {q:"la moyenne", a:"der Durchschnitt", wrong:["das Maximum","das Minimum","die Summe"]},
+      {q:"rendre qc à qn", a:"jdm. etw. zurückgeben", wrong:["etw. nehmen","etw. kaufen","etw. verkaufen"]},
+      {q:"terminer qc", a:"etw. beenden / fertigstellen", wrong:["etw. anfangen","etw. planen","etw. verschieben"]},
+      {q:"une route", a:"eine (Land)Straße / eine Route", wrong:["eine Autobahn","ein Weg","eine Strecke"]},
+      {q:"lorsque", a:"wenn / als", wrong:["weil","obwohl","damit"]},
+      {q:"une épaule", a:"eine Schulter", wrong:["ein Arm","ein Ellbogen","ein Handgelenk"]},
+      {q:"jaloux/jalouse de qn", a:"eifersüchtig auf jdn. / neidisch auf jdn.", wrong:["verliebt in jdn.","wütend auf jdn.","stolz auf jdn."]},
+      {q:"une impression", a:"ein Eindruck", wrong:["eine Meinung","ein Gefühl","eine Ansicht"]},
+      {q:"quelques", a:"einige", wrong:["viele","wenige","alle"]},
+      {q:"avoir la pêche", a:"gut drauf sein (ugs.)", wrong:["hungrig sein","müde sein","traurig sein"]},
+      {q:"africain/africaine", a:"afrikanisch", wrong:["asiatisch","amerikanisch","europäisch"]},
+      {q:"la Côte d'Ivoire", a:"die Elfenbeinküste", wrong:["Senegal","Kamerun","Togo"]},
+      {q:"dessiner qc", a:"etw. zeichnen", wrong:["etw. malen","etw. fotografieren","etw. basteln"]},
+      {q:"encourager qn", a:"jdn. ermutigen", wrong:["jdn. beruhigen","jdn. bestrafen","jdn. ignorieren"]},
+      {q:"un sourire", a:"ein Lächeln", wrong:["ein Lachen","ein Blick","ein Augenzwinkern"]},
+      {q:"au fond de qc", a:"hinten in etw. / unten in etw.", wrong:["vor etw.","neben etw.","über etw."]},
+      {q:"une statuette", a:"eine Figur / eine Statuette", wrong:["ein Gemälde","ein Poster","eine Skulptur"]},
+      {q:"disparaître", a:"verschwinden", wrong:["erscheinen","ankommen","zurückkehren"]},
+      {q:"toucher qn/qc", a:"jdn./etw. berühren", wrong:["jdn. sehen","jdn. hören","jdn. riechen"]},
+      {q:"une larme", a:"eine Träne", wrong:["ein Lächeln","ein Blick","ein Schmerz"]},
+      {q:"fouiller (dans) qc", a:"etw. durchsuchen", wrong:["etw. aufräumen","etw. verstecken","etw. verlieren"]},
+      {q:"voler qc", a:"etw. stehlen", wrong:["etw. kaufen","etw. verleihen","etw. verschenken"]},
+      {q:"un principal / une principale", a:"ein Schulleiter / eine Schulleiterin", wrong:["ein Lehrer","ein Direktor","ein Rektor"]},
+      {q:"dehors", a:"draußen / hier: Raus!", wrong:["drinnen","oben","unten"]},
+      {q:"rapporter qc", a:"etw. mitbringen", wrong:["etw. mitnehmen","etw. kaufen","etw. verlieren"]},
+      {q:"parmi", a:"unter", wrong:["zwischen","neben","vor"]},
+      {q:"l'Afrique (f.)", a:"Afrika", wrong:["Asien","Amerika","Europa"]},
+      {q:"furieux/furieuse", a:"wütend / zornig", wrong:["traurig","glücklich","überrascht"]},
+      {q:"profiter de qc", a:"etw. ausnutzen / von etw. profitieren", wrong:["etw. vermeiden","etw. verlieren","etw. ignorieren"]},
+      {q:"une découverte", a:"eine Entdeckung", wrong:["eine Erfindung","eine Reise","ein Abenteuer"]},
+      {q:"arriver à faire qc", a:"es schaffen, etw. zu tun", wrong:["versuchen etw. zu tun","aufhören etw. zu tun","planen etw. zu tun"]},
+      {q:"le lendemain", a:"am folgenden Tag", wrong:["am gleichen Tag","am Vortag","in einer Woche"]},
+      {q:"devenir qn/qc", a:"jd./etw. werden", wrong:["bleiben","sein","haben"]},
+      {q:"garder qc", a:"etw. behalten", wrong:["etw. weggeben","etw. kaufen","etw. verleihen"]},
+      {q:"sinon", a:"sonst / andernfalls", wrong:["deshalb","trotzdem","obwohl"]},
+      {q:"clair/claire", a:"hell / klar", wrong:["dunkel","trüb","unklar"]},
+      {q:"un casier", a:"ein Fach", wrong:["ein Schrank","eine Schublade","ein Regal"]},
+      {q:"une autorisation", a:"eine Erlaubnis / eine Genehmigung", wrong:["ein Verbot","eine Strafe","eine Regel"]},
+      {q:"une seconde", a:"eine Sekunde", wrong:["eine Minute","eine Stunde","ein Moment"]},
+      {q:"un vol", a:"hier: ein Diebstahl / ein Raub", wrong:["ein Flug","ein Unfall","ein Einbruch"]},
+      {q:"chaque fois que", a:"jedes Mal, wenn", wrong:["immer wenn","sobald","bevor"]},
+      {q:"pâle/pâle", a:"bleich", wrong:["blass","rot","braun"]},
+      {q:"pardonner qc à qn", a:"jdm. etw. verzeihen", wrong:["jdn. bestrafen","jdn. anklagen","jdn. ignorieren"]},
+      {q:"accuser qn", a:"jdn. anklagen", wrong:["jdn. loben","jdn. befreien","jdn. verteidigen"]},
+      {q:"la police", a:"die Polizei", wrong:["die Feuerwehr","das Gericht","die Armee"]},
+      {q:"garder qc", a:"etw. behalten", wrong:["etw. wegwerfen","etw. verschenken","etw. verkaufen"]},
+      {q:"courir", a:"laufen / rennen", wrong:["gehen","schleichen","springen"]},
+      {q:"éclater de rire", a:"in Gelächter ausbrechen", wrong:["zu weinen beginnen","zu schreien beginnen","still werden"]},
+      {q:"pendant que", a:"während (Konjunktion)", wrong:["weil","obwohl","wenn"]},
+      {q:"une armoire", a:"ein Schrank", wrong:["ein Regal","eine Kommode","ein Schubfach"]},
+      {q:"à moitié", a:"zur Hälfte / halb", wrong:["ganz","fast","kaum"]},
+      {q:"cacher qc", a:"etw. verstecken", wrong:["etw. zeigen","etw. suchen","etw. finden"]},
+      {q:"un pas", a:"ein Schritt", wrong:["ein Sprung","ein Lauf","ein Gang"]},
+      {q:"de près", a:"aus der Nähe / von Nahem", wrong:["von Weitem","von oben","von unten"]},
+      {q:"hésiter à faire qc", a:"zögern, etw. zu tun", wrong:["sich beeilen","entscheiden","vergessen"]},
+      {q:"une voix", a:"eine Stimme", wrong:["ein Ton","ein Laut","ein Geräusch"]},
+      {q:"un médicament", a:"ein Medikament", wrong:["eine Tablette","ein Mittel","ein Rezept"]},
+      {q:"dénoncer qn", a:"jdn. verraten", wrong:["jdn. schützen","jdn. loben","jdn. helfen"]},
+      {q:"autour de qn/qc", a:"um jdn./etw. herum", wrong:["neben jdm.","vor jdm.","hinter jdm."]},
+      {q:"soupçonner qn de qc", a:"jdn. einer Sache verdächtigen", wrong:["jdn. loben","jdn. schützen","jdn. fragen"]},
+    ]
+  },
+  {
+    id: "u3", label: "Unité 3", name: "Lille-Marseille en cinq heures", color: "#6af7d4",
+    questions: [
+      {q:"une frontière", a:"eine Grenze", wrong:["eine Region","ein Territorium","eine Zone"]},
+      {q:"belge/belge", a:"belgisch", wrong:["französisch","niederländisch","luxemburgisch"]},
+      {q:"une capitale", a:"eine Hauptstadt", wrong:["eine Großstadt","eine Metropole","eine Provinzstadt"]},
+      {q:"flamand/flamande", a:"flämisch", wrong:["wallonisch","belgisch","niederländisch"]},
+      {q:"un hôtel de ville", a:"ein Rathaus", wrong:["ein Schloss","ein Museum","ein Theater"]},
+      {q:"un beffroi", a:"ein Glockenturm", wrong:["ein Turm","ein Kirchturm","ein Aussichtsturm"]},
+      {q:"une braderie", a:"ein Trödelmarkt", wrong:["ein Flohmarkt","ein Markt","ein Basar"]},
+      {q:"plus de", a:"mehr als", wrong:["weniger als","so viel wie","genau so viel wie"]},
+      {q:"un visiteur / une visiteuse", a:"ein Besucher / eine Besucherin", wrong:["ein Tourist","ein Gast","ein Reisender"]},
+      {q:"un accent", a:"ein Akzent (eine Art der Aussprache)", wrong:["ein Dialekt","eine Betonung","eine Sprache"]},
+      {q:"un habitant / une habitante", a:"ein Einwohner / eine Einwohnerin", wrong:["ein Bürger","ein Bewohner","ein Stadtbewohner"]},
+      {q:"une spécialité", a:"eine Spezialität", wrong:["eine Eigenheit","eine Besonderheit","eine Tradition"]},
+      {q:"un caractère", a:"ein Charakter", wrong:["eine Persönlichkeit","ein Merkmal","eine Eigenschaft"]},
+      {q:"multiculturel/multiculturelle", a:"multikulturell", wrong:["international","global","vielfältig"]},
+      {q:"un carrefour", a:"eine Kreuzung / ein Schnittpunkt", wrong:["eine Einmündung","ein Platz","eine Gabelung"]},
+      {q:"l'Europe (f.)", a:"Europa", wrong:["Asien","Amerika","Afrika"]},
+      {q:"Bruxelles", a:"Brüssel", wrong:["Paris","Amsterdam","Lüttich"]},
+      {q:"Londres", a:"London", wrong:["Berlin","Madrid","Wien"]},
+      {q:"européen/européenne", a:"europäisch", wrong:["international","global","westlich"]},
+      {q:"une culture", a:"eine Kultur", wrong:["eine Tradition","eine Gesellschaft","eine Zivilisation"]},
+      {q:"un point commun", a:"eine Gemeinsamkeit", wrong:["ein Unterschied","ein Merkmal","ein Detail"]},
+      {q:"la Méditerranée", a:"das Mittelmeer", wrong:["der Atlantik","der Ärmelkanal","die Nordsee"]},
+      {q:"la région PACA", a:"Region im Südosten Frankreichs", wrong:["Region in Nordfrankreich","Region in Westfrankreich","Region in Ostfrankreich"]},
+      {q:"ancien/ancienne", a:"alt", wrong:["neu","modern","jung"]},
+      {q:"vivant/vivante", a:"lebendig / lebhaft", wrong:["ruhig","langweilig","träge"]},
+      {q:"un savon", a:"eine Seife", wrong:["ein Shampoo","eine Creme","ein Parfum"]},
+      {q:"une calanque", a:"eine Felsbucht", wrong:["eine Bucht","eine Höhle","ein Strand"]},
+      {q:"une bouillabaisse", a:"provenzalische Fischsuppe", wrong:["eine Fleischsuppe","eine Gemüsesuppe","eine Nudelsuppe"]},
+      {q:"un marché aux puces", a:"ein Flohmarkt", wrong:["ein Trödelmarkt","ein Basar","ein Wochenmarkt"]},
+      {q:"être en train de faire qc", a:"gerade etw. tun", wrong:["etw. planen","etw. beenden","etw. beginnen"]},
+      {q:"une bonne affaire", a:"ein Schnäppchen", wrong:["ein Kauf","ein Angebot","ein Rabatt"]},
+      {q:"une folie", a:"ein Wahnsinn", wrong:["eine Idee","ein Abenteuer","ein Traum"]},
+      {q:"venir de faire qc", a:"gerade etw. getan haben", wrong:["etw. planen","etw. beginnen","etw. wollen"]},
+      {q:"mauvais/mauvaise", a:"hier: falsch", wrong:["schlecht","böse","falsch"]},
+      {q:"comme", a:"da", wrong:["weil","obwohl","wenn"]},
+      {q:"vide/vide", a:"leer", wrong:["voll","halb","fast leer"]},
+      {q:"surveiller qn/qc", a:"jdn./etw. überwachen", wrong:["jdn. beobachten","jdn. suchen","jdn. finden"]},
+      {q:"un job (fam.)", a:"ein Job (ugs.)", wrong:["eine Stelle","ein Beruf","ein Praktikum"]},
+      {q:"un étudiant / une étudiante", a:"ein Student / eine Studentin", wrong:["ein Schüler","ein Azubi","ein Praktikant"]},
+      {q:"une terrasse", a:"eine Terrasse", wrong:["ein Balkon","eine Veranda","ein Dachgarten"]},
+      {q:"un toit", a:"ein Dach", wrong:["eine Decke","ein Boden","eine Wand"]},
+      {q:"une série", a:"eine Serie", wrong:["ein Film","eine Sendung","ein Programm"]},
+      {q:"une langue", a:"eine Sprache", wrong:["ein Dialekt","ein Akzent","eine Schrift"]},
+      {q:"un artiste / une artiste", a:"ein Künstler / eine Künstlerin", wrong:["ein Maler","ein Musiker","ein Schauspieler"]},
+      {q:"stressé/stressée", a:"gestresst", wrong:["erschöpft","übermüdet","nervös"]},
+      {q:"une carte mémoire", a:"eine Speicherkarte", wrong:["eine Karte","eine Festplatte","ein USB-Stick"]},
+      {q:"un appareil photo", a:"ein Fotoapparat", wrong:["eine Kamera","ein Handy","ein Tablet"]},
+      {q:"avant de faire qc", a:"bevor man etw. tut", wrong:["nachdem man etw. getan hat","während man etw. tut","wenn man etw. tut"]},
+      {q:"faire la fête", a:"feiern", wrong:["Spaß haben","tanzen","singen"]},
+      {q:"le Maroc", a:"Marokko", wrong:["Tunesien","Algerien","Ägypten"]},
+      {q:"marocain/marocaine", a:"marokkanisch", wrong:["algerisch","tunesisch","ägyptisch"]},
+      {q:"un couscous", a:"ein Couscous", wrong:["ein Tabbouleh","ein Hummus","ein Falafel"]},
+      {q:"l'intégration (f.)", a:"die Integration", wrong:["die Einwanderung","die Anpassung","die Gesellschaft"]},
+      {q:"rendre visite à qn", a:"jdn. besuchen", wrong:["jdn. anrufen","jdn. schreiben","jdn. treffen"]},
+      {q:"exister", a:"existieren", wrong:["leben","sein","bleiben"]},
+      {q:"accueillir qn", a:"jdn. empfangen", wrong:["jdn. begrüßen","jdn. treffen","jdn. einladen"]},
+      {q:"un étranger / une étrangère", a:"ein Fremder / eine Fremde", wrong:["ein Ausländer","ein Tourist","ein Neuankömmling"]},
+      {q:"une origine", a:"eine Herkunft", wrong:["eine Geschichte","ein Hintergrund","eine Tradition"]},
+      {q:"moins de", a:"weniger als", wrong:["mehr als","so viel wie","fast"]},
+      {q:"être issu(e) de qc", a:"aus etw. hervorgehen", wrong:["etw. werden","etw. verlassen","etw. beenden"]},
+      {q:"l'immigration (f.)", a:"die Einwanderung", wrong:["die Auswanderung","die Reise","die Flucht"]},
+      {q:"exotique/exotique", a:"exotisch", wrong:["fremd","selten","ungewöhnlich"]},
+      {q:"des fruits de mer", a:"Meeresfrüchte", wrong:["Früchte","Fisch","Meerestiere"]},
+      {q:"une ambiance", a:"eine Stimmung / eine Atmosphäre", wrong:["eine Umgebung","ein Gefühl","ein Klima"]},
+      {q:"un Marseillais / une Marseillaise", a:"Einwohner(in) von Marseille", wrong:["Einwohner von Lyon","Einwohner von Paris","Einwohner von Nizza"]},
+      {q:"un Lillois / une Lilloise", a:"Einwohner(in) von Lille", wrong:["Einwohner von Lyon","Einwohner von Nantes","Einwohner von Bordeaux"]},
+      {q:"une aire de jeux", a:"ein Spielplatz", wrong:["ein Park","ein Garten","ein Sportplatz"]},
+    ]
+  },
+  {
+    id: "u4", label: "Unité 4", name: "Bon séjour en Normandie!", color: "#f7e26a",
+    questions: [
+      {q:"un séjour", a:"ein Aufenthalt", wrong:["eine Reise","ein Urlaub","ein Besuch"]},
+      {q:"un voisin / une voisine", a:"ein Nachbar / eine Nachbarin", wrong:["ein Freund","ein Bekannter","ein Mitbewohner"]},
+      {q:"un échange scolaire", a:"ein Schüleraustausch", wrong:["ein Schulausflug","ein Schulprojekt","ein Schulwettbewerb"]},
+      {q:"un correspondant / une correspondante", a:"ein Brieffreund / eine Brieffreundin", wrong:["ein Schulfreund","ein Klassenkamerad","ein Mitschüler"]},
+      {q:"s'informer sur qc", a:"sich über etw. informieren", wrong:["etw. lernen","etw. studieren","etw. recherchieren"]},
+      {q:"un programme", a:"ein Programm", wrong:["ein Plan","ein Ablauf","ein Zeitplan"]},
+      {q:"un car", a:"ein Reisebus", wrong:["ein Bus","ein Zug","ein Taxi"]},
+      {q:"se trouver", a:"sich befinden", wrong:["sich treffen","sich finden","sich verstecken"]},
+      {q:"qu'est-ce qui … ?", a:"Was … ? (Fragepronomen, Subjekt ist eine Sache)", wrong:["Wer … ?","Was … ? (Objekt)","Wie … ?"]},
+      {q:"un quiz", a:"ein Quiz", wrong:["ein Test","eine Prüfung","ein Rätsel"]},
+      {q:"qu'est-ce que … ?", a:"Wen … ?", wrong:["Was … ?","Wer … ?","Wie … ?"]},
+      {q:"un camembert", a:"ein Camembert", wrong:["ein Brie","ein Gouda","ein Emmentaler"]},
+      {q:"une côte", a:"eine Küste", wrong:["eine Bucht","ein Strand","ein Ufer"]},
+      {q:"normand/normande", a:"normannisch / aus der Normandie", wrong:["bretonisch","provenzalisch","elsässisch"]},
+      {q:"une tapisserie", a:"eine Tapete / hier: ein Wandteppich", wrong:["ein Gemälde","ein Poster","eine Stickerei"]},
+      {q:"une conquête", a:"eine Eroberung", wrong:["eine Entdeckung","eine Reise","ein Sieg"]},
+      {q:"l'Angleterre (f.)", a:"England", wrong:["Großbritannien","Irland","Wales"]},
+      {q:"un débarquement", a:"eine Landung (eines Schiffes)", wrong:["eine Ankunft","ein Angriff","eine Invasion"]},
+      {q:"un mont", a:"ein kleiner Berg", wrong:["ein Hügel","ein Gipfel","ein Berg"]},
+      {q:"se perdre", a:"sich verirren / sich verlaufen", wrong:["sich finden","sich treffen","sich auskennen"]},
+      {q:"dépenser (de l'argent)", a:"(Geld) ausgeben", wrong:["Geld verdienen","Geld sparen","Geld wechseln"]},
+      {q:"se débrouiller", a:"zurechtkommen / sich zu helfen wissen", wrong:["scheitern","aufgeben","verlieren"]},
+      {q:"un contact", a:"ein Kontakt", wrong:["eine Verbindung","eine Beziehung","ein Bekannter"]},
+      {q:"poli/polie", a:"höflich", wrong:["unhöflich","freundlich","nett"]},
+      {q:"une valise", a:"ein Koffer", wrong:["eine Tasche","ein Rucksack","eine Reisetasche"]},
+      {q:"un souci", a:"eine Sorge", wrong:["ein Problem","ein Kummer","eine Angst"]},
+      {q:"gros/grosse", a:"dick / groß / schwer (Sachen, Tiere)", wrong:["klein","leicht","dünn"]},
+      {q:"des fringues (fam.)", a:"Klamotten (ugs.)", wrong:["Kleidung","Sachen","Garderobe"]},
+      {q:"dingue/dingue (fam.)", a:"bekloppt (ugs.) / verrückt / wahnsinnig", wrong:["cool","toll","super"]},
+      {q:"le ventre", a:"der Bauch", wrong:["der Magen","die Hüfte","das Becken"]},
+      {q:"oser faire qc", a:"wagen, etw. zu tun / sich trauen, etw. zu tun", wrong:["müssen etw. zu tun","können etw. zu tun","wollen etw. zu tun"]},
+      {q:"avoir la dalle (fam.)", a:"Kohldampf haben (ugs.)", wrong:["satt sein","Hunger haben","durstig sein"]},
+      {q:"un poisson", a:"ein Fisch", wrong:["ein Meerestier","ein Tintenfisch","ein Krebs"]},
+      {q:"délicieux/délicieuse", a:"köstlich / lecker", wrong:["gut","schön","toll"]},
+      {q:"un petit copain / une petite copine", a:"ein fester Freund / eine feste Freundin", wrong:["ein Bekannter","ein Schulfreund","ein Nachbar"]},
+      {q:"gêné/gênée", a:"verlegen", wrong:["traurig","überrascht","enttäuscht"]},
+      {q:"qc arrive à qn", a:"etw. ist mit jdm. los / etw. passiert jdm.", wrong:["etw. gehört jdm.","etw. gefällt jdm.","etw. fehlt jdm."]},
+      {q:"éviter qc", a:"etw. vermeiden", wrong:["etw. suchen","etw. riskieren","etw. wagen"]},
+      {q:"débile/débile (fam.)", a:"dämlich (ugs.)", wrong:["klug","dumm","blöd"]},
+      {q:"méchant/méchante", a:"gemein / böse", wrong:["freundlich","nett","lieb"]},
+      {q:"une abbaye", a:"eine Abtei", wrong:["ein Kloster","eine Kathedrale","eine Kirche"]},
+      {q:"impressionnant/impressionnante", a:"beeindruckend", wrong:["überraschend","erstaunlich","unglaublich"]},
+      {q:"un poison", a:"ein Gift", wrong:["ein Schmerzmittel","ein Medikament","eine Droge"]},
+      {q:"une faute", a:"ein Fehler", wrong:["ein Irrtum","ein Missverständnis","ein Problem"]},
+      {q:"gentil/gentille", a:"nett", wrong:["freundlich","höflich","lieb"]},
+      {q:"une compétition", a:"ein Wettkampf", wrong:["ein Turnier","ein Wettbewerb","ein Spiel"]},
+      {q:"un char à voile", a:"ein Strandsegler", wrong:["ein Segelboot","ein Drachen","ein Windsurfer"]},
+      {q:"un carnet", a:"ein (kleines) Heft / ein Notizbuch", wrong:["ein Tagebuch","ein Heft","ein Block"]},
+      {q:"un carnet de voyage", a:"ein Reisetagebuch", wrong:["ein Reiseführer","ein Reiseplan","ein Reisebericht"]},
+      {q:"une infusion", a:"ein Kräutertee", wrong:["ein Tee","ein Aufguss","ein Heißgetränk"]},
+      {q:"un thé", a:"ein Tee", wrong:["ein Kaffee","ein Kakao","ein Tisane"]},
+      {q:"des herbes (f. pl.)", a:"Kräuter", wrong:["Gewürze","Pflanzen","Blätter"]},
+      {q:"un hôpital", a:"ein Krankenhaus", wrong:["eine Klinik","eine Arztpraxis","eine Notaufnahme"]},
+      {q:"malade/malade", a:"krank", wrong:["verletzt","erschöpft","müde"]},
+      {q:"faux/fausse", a:"falsch", wrong:["richtig","wahr","echt"]},
+      {q:"un niveau", a:"ein Niveau / eine Stufe", wrong:["eine Ebene","eine Schicht","ein Grad"]},
+      {q:"une soirée", a:"ein Abend (im Verlauf)", wrong:["eine Nacht","ein Nachmittag","ein Abend"]},
+      {q:"touristique/touristique", a:"touristisch", wrong:["historisch","kulturell","regional"]},
+      {q:"une baie", a:"eine Bucht", wrong:["eine Küste","ein Strand","eine Felsbucht"]},
+      {q:"un panneau", a:"ein Schild / ein Hinweisschild", wrong:["ein Plakat","ein Schriftzug","ein Wegweiser"]},
+      {q:"un danger", a:"eine Gefahr", wrong:["ein Risiko","ein Problem","eine Bedrohung"]},
+      {q:"exactement", a:"genau", wrong:["fast","ungefähr","wirklich"]},
+      {q:"les marées (f. pl.)", a:"die Gezeiten (Ebbe und Flut)", wrong:["die Wellen","die Strömung","der Tidenhub"]},
+      {q:"obligatoire/obligatoire", a:"obligatorisch", wrong:["freiwillig","optional","empfohlen"]},
+      {q:"passer (un examen)", a:"eine Prüfung ablegen", wrong:["eine Prüfung bestehen","eine Prüfung schreiben","eine Prüfung wiederholen"]},
+      {q:"se promener", a:"spazieren gehen", wrong:["gehen","laufen","wandern"]},
+      {q:"un mètre", a:"ein Meter", wrong:["ein Kilometer","ein Zentimeter","ein Dezimeter"]},
+      {q:"par", a:"durch / mit", wrong:["für","von","über"]},
+      {q:"un duc", a:"ein Herzog", wrong:["ein König","ein Graf","ein Fürst"]},
+      {q:"un cheval / des chevaux", a:"ein Pferd / Pferde", wrong:["ein Esel","ein Pony","ein Maultier"]},
+      {q:"se battre", a:"kämpfen", wrong:["streiten","diskutieren","wetteifern"]},
+      {q:"une victoire", a:"ein Sieg", wrong:["eine Niederlage","ein Unentschieden","ein Erfolg"]},
+      {q:"un roi / une reine", a:"ein König / eine Königin", wrong:["ein Kaiser","ein Fürst","ein Prinz"]},
+      {q:"une scène", a:"eine Szene", wrong:["ein Akt","ein Bild","ein Teil"]},
+      {q:"le Moyen Âge", a:"das Mittelalter", wrong:["die Antike","die Neuzeit","die Moderne"]},
+      {q:"la construction", a:"der Bau / die Konstruktion", wrong:["die Zerstörung","die Renovierung","die Restaurierung"]},
+      {q:"mondial/mondiale", a:"Welt-", wrong:["national","international","global"]},
+      {q:"un soldat", a:"ein Soldat", wrong:["ein Offizier","ein General","ein Kämpfer"]},
+      {q:"libérer qn/qc", a:"jdn./etw. befreien", wrong:["jdn. einsperren","jdn. gefangen nehmen","jdn. festhalten"]},
+      {q:"l'occupation nazie (f.)", a:"die Nazibesatzung", wrong:["die Besatzung","die Invasion","die Okkupation"]},
+      {q:"un bloc de béton", a:"ein Betonblock", wrong:["ein Betonwall","ein Bunker","ein Betonwürfel"]},
+      {q:"les Alliés (m. pl.)", a:"die Alliierten", wrong:["die Verbündeten","die Partner","die Koalition"]},
+      {q:"diriger qc", a:"etw. lenken / etw. steuern", wrong:["etw. führen","etw. leiten","etw. kontrollieren"]},
+      {q:"s'entraîner", a:"trainieren", wrong:["üben","vorbereiten","sportlich sein"]},
+      {q:"une roue", a:"ein Rad", wrong:["ein Reifen","eine Felge","eine Achse"]},
+      {q:"se blesser", a:"sich verletzen", wrong:["sich erholen","sich ausruhen","sich wärmen"]},
+      {q:"bouger qc", a:"etw. bewegen", wrong:["etw. heben","etw. tragen","etw. schieben"]},
+      {q:"les urgences (f. pl.)", a:"die Notaufnahme", wrong:["der Notarzt","das Krankenhaus","der Sanitäter"]},
+      {q:"un médecin / une médecin", a:"ein Arzt / eine Ärztin", wrong:["ein Sanitäter","ein Pfleger","ein Apotheker"]},
+      {q:"une foulure", a:"eine Verstauchung", wrong:["ein Bruch","eine Zerrung","eine Prellung"]},
+      {q:"un patient / une patiente", a:"ein Patient / eine Patientin", wrong:["ein Kunde","ein Besucher","ein Gast"]},
+      {q:"prendre rendez-vous avec qn", a:"einen Termin (mit jdm.) vereinbaren", wrong:["jdn. besuchen","jdn. anrufen","jdn. einladen"]},
+      {q:"un docteur / une docteure", a:"ein Doktor / eine Ärztin", wrong:["ein Arzt","ein Chirurg","ein Spezialist"]},
+      {q:"urgent/urgente", a:"dringend", wrong:["wichtig","notwendig","eilig"]},
+      {q:"la gorge", a:"der Hals", wrong:["der Nacken","die Kehle","die Gurgel"]},
+      {q:"la fièvre", a:"das Fieber", wrong:["die Erkältung","die Grippe","die Entzündung"]},
+      {q:"une ordonnance", a:"ein Rezept (vom Arzt)", wrong:["ein Rezept (Kochen)","ein Attest","ein Gutachten"]},
+      {q:"une maladie", a:"eine Krankheit", wrong:["eine Verletzung","eine Behinderung","ein Leiden"]},
+      {q:"une assurance maladie", a:"eine Krankenversicherung", wrong:["eine Haftpflichtversicherung","eine Rentenversicherung","eine Unfallversicherung"]},
+      {q:"une pharmacie", a:"eine Apotheke", wrong:["eine Drogerie","ein Sanitätshaus","ein Gesundheitszentrum"]},
+      {q:"rembourser qn de qc", a:"jdm. etw. zurückzahlen / erstatten", wrong:["jdm. etw. leihen","jdm. etw. schenken","jdm. etw. geben"]},
+      {q:"revoir qn/qc", a:"jdn./etw. wiedersehen", wrong:["jdn. kennenlernen","jdn. besuchen","jdn. treffen"]},
+    ]
+  },
+  {
+    id: "u5", label: "Unité 5", name: "Bienvenue au Québec!", color: "#a26af7",
+    questions: [
+      {q:"le Québec", a:"Quebec (Provinz im Osten Kanadas)", wrong:["Ontario","British Columbia","Alberta"]},
+      {q:"la francophonie", a:"die Frankofonie", wrong:["die Frankophonie","die Französischsprachigkeit","die Frankrei-chzone"]},
+      {q:"l'ensemble (m.)", a:"die Gesamtheit", wrong:["die Menge","die Gruppe","die Summe"]},
+      {q:"quotidien/quotidienne", a:"täglich", wrong:["wöchentlich","monatlich","jährlich"]},
+      {q:"francophone/francophone", a:"französischsprachig", wrong:["englischsprachig","zweisprachig","mehrsprachig"]},
+      {q:"une chaîne de télévision", a:"ein Fernsehsender", wrong:["ein Radiosender","ein Fernsehkanal","ein Programm"]},
+      {q:"un drapeau", a:"eine Fahne / eine Flagge", wrong:["ein Banner","ein Symbol","ein Wappen"]},
+      {q:"un paysage", a:"eine Landschaft", wrong:["eine Aussicht","eine Natur","eine Umgebung"]},
+      {q:"énorme/énorme", a:"riesig / Riesen-", wrong:["groß","gewaltig","gigantisch"]},
+      {q:"le Canada", a:"Kanada", wrong:["Amerika","Australien","Neuseeland"]},
+      {q:"absolu/absolue", a:"absolut", wrong:["total","komplett","vollständig"]},
+      {q:"faire partie de qc", a:"zu etw. gehören / Teil von etw. sein", wrong:["etw. besitzen","etw. bilden","etw. darstellen"]},
+      {q:"l'Amérique (f.)", a:"Amerika", wrong:["Kanada","Südamerika","Nordamerika"]},
+      {q:"un territoire d'outre-mer", a:"ein (Übersee)Gebiet / ein Territorium", wrong:["eine Kolonie","ein Protektorat","ein Bundesland"]},
+      {q:"un continent", a:"ein Kontinent", wrong:["ein Land","eine Region","ein Erdteil"]},
+      {q:"présent/présente", a:"vorhanden / anwesend", wrong:["abwesend","fehlend","weg"]},
+      {q:"la Belgique", a:"Belgien", wrong:["Luxemburg","die Niederlande","die Schweiz"]},
+      {q:"la Suisse", a:"die Schweiz", wrong:["Österreich","Liechtenstein","Belgien"]},
+      {q:"une province", a:"eine Provinz", wrong:["ein Staat","eine Region","ein Bezirk"]},
+      {q:"une langue maternelle", a:"eine Muttersprache", wrong:["eine Fremdsprache","eine Zweitsprache","eine Amtssprache"]},
+      {q:"l'Algérie (f.)", a:"Algerien", wrong:["Marokko","Tunesien","Libyen"]},
+      {q:"la Tunisie", a:"Tunesien", wrong:["Marokko","Algerien","Libyen"]},
+      {q:"l'arabe (m.)", a:"das Arabische", wrong:["das Berberische","das Arabische","das Tamazight"]},
+      {q:"administratif/administrative", a:"Verwaltungs- / behördlich", wrong:["politisch","staatlich","offiziell"]},
+      {q:"les médias (m. pl.)", a:"die Medien", wrong:["die Presse","die Zeitung","die Zeitschriften"]},
+      {q:"les Antilles (f. pl.)", a:"die Antillen (Inselgruppe in der Karibik)", wrong:["die Bermudas","die Bahamas","die Kanaren"]},
+      {q:"courant/courante", a:"fließend", wrong:["gut","perfekt","ausgezeichnet"]},
+      {q:"donc", a:"also", wrong:["deshalb","daher","folglich"]},
+      {q:"un rôle", a:"eine Rolle", wrong:["eine Aufgabe","eine Funktion","eine Position"]},
+      {q:"au cours de", a:"im Laufe einer Sache", wrong:["während","bei","in"]},
+      {q:"le Portugal", a:"Portugal", wrong:["Spanien","Brasilien","Italien"]},
+      {q:"une colonie", a:"eine Kolonie", wrong:["ein Territorium","ein Protektorat","ein Besitz"]},
+      {q:"un Français / une Française", a:"ein Franzose / eine Französin", wrong:["ein Frankokanadier","ein Belgier","ein Schweizer"]},
+      {q:"la richesse", a:"der Reichtum", wrong:["die Armut","das Vermögen","der Wohlstand"]},
+      {q:"indépendant/indépendante", a:"unabhängig", wrong:["abhängig","frei","autonom"]},
+      {q:"la Martinique", a:"Martinique (Insel in der Karibik)", wrong:["Guadeloupe","Réunion","Mayotte"]},
+      {q:"québécois/québécoise", a:"aus Quebec", wrong:["aus Montreal","aus Ottawa","aus Kanada"]},
+      {q:"un tiers de", a:"ein Drittel des/der", wrong:["die Hälfte","ein Viertel","ein Fünftel"]},
+      {q:"total/totale", a:"vollständig / völlig / total", wrong:["teilweise","fast","ungefähr"]},
+      {q:"partenaire/partenaire", a:"Partner-", wrong:["Freund-","Begleiter-","Kollegen-"]},
+      {q:"être jumelé(e) avec", a:"eine (Städte)Partnerschaft haben mit", wrong:["verbunden sein mit","befreundet sein mit","zusammenarbeiten mit"]},
+      {q:"une langue officielle", a:"eine Amtssprache", wrong:["eine Muttersprache","eine Nationalsprache","eine Verkehrssprache"]},
+      {q:"un Québécois / une Québécoise", a:"ein Quebecer / eine Quebecerin", wrong:["ein Kanadier","ein Frankokanadier","ein Montrealer"]},
+      {q:"bavarois/bavaroise", a:"bayerisch", wrong:["österreichisch","schweizerisch","alemannisch"]},
+      {q:"certain/certaine", a:"gewiss / sicher", wrong:["vielleicht","möglicherweise","wahrscheinlich"]},
+      {q:"la glace", a:"das Eis", wrong:["der Schnee","das Eis (Speiseeis)","der Frost"]},
+      {q:"le hockey sur glace", a:"das Eishockey", wrong:["das Feldhockey","das Inline-Hockey","das Bandy"]},
+      {q:"magnifique/magnifique", a:"wunderschön / großartig", wrong:["schön","toll","beeindruckend"]},
+      {q:"un lac", a:"ein See", wrong:["ein Teich","ein Fluss","ein Weiher"]},
+      {q:"national/nationale", a:"national / staatlich", wrong:["lokal","regional","international"]},
+      {q:"une randonnée", a:"eine Wanderung", wrong:["ein Spaziergang","ein Ausflug","eine Tour"]},
+      {q:"faire de la randonnée", a:"wandern", wrong:["spazieren gehen","joggen","radfahren"]},
+      {q:"un canoë", a:"ein Kanu", wrong:["ein Kajak","ein Boot","ein Schlauchboot"]},
+      {q:"un traîneau", a:"ein Schlitten (von Pferden oder Hunden gezogen)", wrong:["ein Schlitten","ein Rodelschlitten","ein Pferdeschlitten"]},
+      {q:"un kilomètre carré", a:"ein Quadratkilometer", wrong:["ein Quadratmeter","ein Hektar","ein Quadratmile"]},
+      {q:"un snowboard", a:"ein Snowboard", wrong:["ein Ski","ein Snowboardhelm","ein Surfbrett"]},
+      {q:"une baleine", a:"ein Wal", wrong:["ein Delfin","ein Schwertwal","ein Blauwal"]},
+      {q:"pêcher qc", a:"etw. angeln", wrong:["etw. fangen","etw. jagen","etw. sammeln"]},
+      {q:"les États-Unis (m. pl.)", a:"die Vereinigten Staaten", wrong:["Amerika","Nordamerika","Kanada"]},
+      {q:"l'Atlantique (m.)", a:"der Atlantik", wrong:["der Pazifik","der Indische Ozean","das Mittelmeer"]},
+      {q:"mourir", a:"sterben", wrong:["fallen","enden","verschwinden"]},
+      {q:"souterrain/souterraine", a:"unterirdisch", wrong:["oberirdisch","unsichtbar","versteckt"]},
+      {q:"faire du shopping", a:"einen Einkaufsbummel machen / shoppen", wrong:["einkaufen","spazieren","bummeln"]},
+      {q:"dynamique/dynamique", a:"dynamisch / hier: lebhaft", wrong:["aktiv","energisch","lebendig"]},
+      {q:"la poutine", a:"Spezialität aus Quebec", wrong:["eine Suppe","ein Gebäck","ein Dessert"]},
+      {q:"typique/typique", a:"typisch", wrong:["charakteristisch","klassisch","traditional"]},
+      {q:"une sauce", a:"eine Soße", wrong:["eine Marinade","eine Vinaigrette","ein Dressing"]},
+      {q:"le sirop d'érable", a:"der Ahornsirup", wrong:["der Honig","der Zuckersirup","der Apfelsirup"]},
+      {q:"fabriquer qc", a:"etw. herstellen", wrong:["etw. produzieren","etw. bauen","etw. erzeugen"]},
+      {q:"une cabane à sucre", a:"Hütte, in der man in Kanada Ahornsirup herstellt", wrong:["eine Hütte","ein Schuppen","ein Chalet"]},
+      {q:"compter qc", a:"etw. zählen", wrong:["etw. rechnen","etw. messen","etw. wiegen"]},
+      {q:"un caribou", a:"ein Karibu", wrong:["ein Elch","ein Rentier","ein Bison"]},
+      {q:"un autochtone / une autochtone", a:"ein Ureinwohner / eine Ureinwohnerin", wrong:["ein Einwohner","ein Einheimischer","ein Stammesangehöriger"]},
+      {q:"fonder qc", a:"etw. gründen", wrong:["etw. bauen","etw. errichten","etw. erschaffen"]},
+      {q:"un Inuit / une Inuit", a:"ein Inuit / eine Inuit (indigene Volksgruppe in Kanada)", wrong:["ein Ureinwohner","ein Indianer","ein Eskimo"]},
+      {q:"l'Arctique (m.)", a:"die Arktis", wrong:["die Antarktis","der Nordpol","das Nordpolarmeer"]},
+      {q:"un ours polaire", a:"ein Eisbär", wrong:["ein Braunbär","ein Grizzly","ein Polarbär"]},
+      {q:"une rencontre", a:"eine Begegnung / ein Treffen", wrong:["ein Treffen","ein Meeting","eine Zusammenkunft"]},
+      {q:"les Jeux olympiques (m. pl.)", a:"die Olympischen Spiele", wrong:["die Weltmeisterschaften","die Europaspiele","die Commonwealth Games"]},
+      {q:"le Grand Nord", a:"der hohe Norden", wrong:["der Norden","Nordkanada","die Arktis"]},
+      {q:"le plus", a:"am meisten", wrong:["am wenigsten","sehr","besonders"]},
+      {q:"la neige", a:"der Schnee", wrong:["das Eis","der Frost","der Hagel"]},
+      {q:"une tempête", a:"ein Sturm / ein Unwetter", wrong:["ein Gewitter","ein Orkan","ein Hurrikan"]},
+      {q:"représenter qn/qc", a:"jdn./etw. darstellen / vertreten / verkörpern", wrong:["jdn. zeigen","jdn. vorstellen","jdn. beschreiben"]},
+      {q:"s'éloigner", a:"sich entfernen", wrong:["sich nähern","weggehen","verschwinden"]},
+      {q:"le ski de fond", a:"der Langlauf", wrong:["der Abfahrtslauf","das Skispringen","das Biathlon"]},
+      {q:"améliorer qc", a:"etw. verbessern", wrong:["etw. verändern","etw. anpassen","etw. optimieren"]},
+      {q:"une technique", a:"eine Technik", wrong:["eine Methode","ein Verfahren","eine Taktik"]},
+      {q:"s'approcher de qn/qc", a:"sich jdm./etw. nähern / jdm./etw. näher kommen", wrong:["sich entfernen","weggehen","fortbewegen"]},
+      {q:"réagir à qc", a:"auf etw. reagieren", wrong:["etw. tun","etw. planen","etw. überlegen"]},
+      {q:"calmer qn", a:"jdn. beruhigen", wrong:["jdn. aufregen","jdn. provozieren","jdn. stören"]},
+      {q:"prudent/prudente", a:"vorsichtig", wrong:["ängstlich","behutsam","vorsorgend"]},
+      {q:"avertir qn", a:"jdn. benachrichtigen / warnen", wrong:["jdn. informieren","jdn. rufen","jdn. alarmieren"]},
+      {q:"un chasseur / une chasseuse", a:"ein Jäger / eine Jägerin", wrong:["ein Förster","ein Wilderer","ein Tierpfleger"]},
+      {q:"partir à la recherche de qn/qc", a:"auf die Suche (nach jdm./etw.) gehen", wrong:["etw. suchen","etw. finden","etw. entdecken"]},
+      {q:"la nourriture", a:"die Nahrung", wrong:["das Essen","die Speise","das Futter"]},
+      {q:"en tout cas", a:"jedenfalls / auf jeden Fall", wrong:["so oder so","jedenfalls","sowieso"]},
+      {q:"un comportement", a:"ein Verhalten", wrong:["eine Haltung","eine Einstellung","ein Benehmen"]},
+      {q:"une médaille", a:"eine Medaille", wrong:["eine Trophäe","ein Pokal","ein Preis"]},
+      {q:"chasser qn/qc", a:"jdn./etw. jagen", wrong:["jdn. verfolgen","jdn. fangen","jdn. suchen"]},
+      {q:"inuit/inuite", a:"Inuit-", wrong:["indigene-","ureinwohner-","einheimische-"]},
+    ]
+  },
+  {
+    id: "u6", label: "Unité 6", name: "Aventures dans le Sud", color: "#f76a6a",
+    questions: [
+      {q:"dépendre de qn/qc", a:"von jdm./etw. abhängen / jdm./etw. unterstehen", wrong:["von jdm. lernen","mit jdm. zusammenarbeiten","jdn. brauchen"]},
+      {q:"politique/politique", a:"politisch", wrong:["wirtschaftlich","gesellschaftlich","kulturell"]},
+      {q:"un gouvernement", a:"eine Regierung", wrong:["ein Parlament","ein Ministerium","eine Behörde"]},
+      {q:"une décision", a:"eine Entscheidung", wrong:["ein Beschluss","eine Wahl","ein Urteil"]},
+      {q:"centralisé/centralisée", a:"zentralisiert / zentralstaatlich", wrong:["föderalistisch","dezentralisiert","regional"]},
+      {q:"fédéral/fédérale", a:"Föderal- / föderalistisch", wrong:["national","zentralistisch","staatlich"]},
+      {q:"un programme scolaire", a:"ein Lehrplan", wrong:["ein Stundenplan","ein Schulprogramm","ein Lernprogramm"]},
+      {q:"lequel/laquelle/lesquels/lesquelles", a:"welcher/welche/welches (Fragepronomen)", wrong:["wer","was","welche Sache"]},
+      {q:"un guide de voyage", a:"ein Reiseführer (Buch)", wrong:["ein Stadtführer","ein Touristenführer","ein Reiseplan"]},
+      {q:"un trésor", a:"ein Schatz", wrong:["ein Fund","ein Geheimnis","ein Reichtum"]},
+      {q:"une chasse au trésor", a:"eine Schatzsuche", wrong:["eine Suche","ein Abenteuer","ein Spiel"]},
+      {q:"une cité", a:"eine Siedlung / eine Altstadt", wrong:["eine Stadt","eine Altstadt","ein Viertel"]},
+      {q:"une ville fortifiée", a:"eine Festungsstadt", wrong:["eine Burg","eine Festung","ein befestigter Ort"]},
+      {q:"médiéval/médiévale", a:"mittelalterlich", wrong:["antik","modern","historisch"]},
+      {q:"un château fort", a:"eine Burg", wrong:["ein Schloss","eine Festung","ein Turm"]},
+      {q:"un chevalier", a:"ein Ritter", wrong:["ein Krieger","ein Soldat","ein Kämpfer"]},
+      {q:"un rempart", a:"eine Festungsmauer / eine Stadtmauer", wrong:["eine Mauer","eine Wand","ein Wall"]},
+      {q:"le patrimoine", a:"das Erbe / das Kulturerbe", wrong:["die Tradition","die Geschichte","das Denkmal"]},
+      {q:"historique/historique", a:"historisch / geschichtlich", wrong:["alt","antik","vergangen"]},
+      {q:"une aide", a:"eine Hilfe / eine Unterstützung", wrong:["ein Rat","ein Tipp","eine Beratung"]},
+      {q:"à l'aide de qc", a:"mit Hilfe von etw.", wrong:["wegen etw.","durch etw.","mit etw."]},
+      {q:"un indice", a:"ein Anzeichen / ein Hinweis / ein Indiz", wrong:["ein Zeichen","ein Hinweis","ein Beweis"]},
+      {q:"noter qc", a:"etw. aufschreiben", wrong:["etw. notieren","etw. schreiben","etw. festhalten"]},
+      {q:"une lettre", a:"ein Buchstabe / ein Brief", wrong:["ein Zeichen","ein Symbol","ein Wort"]},
+      {q:"attaquer qn/qc", a:"jdn./etw. angreifen", wrong:["jdn. verteidigen","jdn. schützen","jdn. bekämpfen"]},
+      {q:"une cloche", a:"eine Glocke", wrong:["ein Gong","eine Klingel","ein Läutewerk"]},
+      {q:"un trou", a:"ein Loch", wrong:["eine Öffnung","ein Leck","ein Spalt"]},
+      {q:"un puits", a:"ein Brunnen", wrong:["eine Quelle","ein Becken","ein Schacht"]},
+      {q:"une profondeur", a:"eine Tiefe", wrong:["eine Höhe","eine Breite","eine Länge"]},
+      {q:"traduire qc", a:"etw. übersetzen", wrong:["etw. dolmetschen","etw. überarbeiten","etw. verfassen"]},
+      {q:"un chiffre", a:"eine Ziffer / eine Zahl", wrong:["eine Nummer","ein Code","ein Zeichen"]},
+      {q:"un serveur / une serveuse", a:"ein Kellner / eine Kellnerin", wrong:["ein Barmann","ein Koch","ein Ober"]},
+      {q:"construire qc", a:"etw. bauen / etw. konstruieren", wrong:["etw. errichten","etw. aufbauen","etw. erbauen"]},
+      {q:"faire le tour de qc", a:"um etw. herumgehen / eine Runde um etw. machen", wrong:["etw. umrunden","etw. besuchen","etw. besichtigen"]},
+      {q:"avoir lieu", a:"sich ereignen / stattfinden", wrong:["geschehen","passieren","entstehen"]},
+      {q:"une solution", a:"eine Lösung", wrong:["eine Antwort","ein Ergebnis","ein Ergebnis"]},
+      {q:"en face de qc", a:"gegenüber von etw.", wrong:["neben etw.","vor etw.","hinter etw."]},
+      {q:"une destination", a:"ein Ziel / ein Bestimmungsort", wrong:["ein Reiseziel","ein Ort","ein Zielort"]},
+      {q:"un safari", a:"eine Safari", wrong:["eine Expedition","eine Tour","ein Abenteuer"]},
+      {q:"naturel/naturelle", a:"natürlich / Natur-", wrong:["künstlich","naturnah","biologisch"]},
+      {q:"une réserve naturelle", a:"ein Naturreservat / ein Naturschutzgebiet", wrong:["ein Nationalpark","ein Wildpark","ein Schutzgebiet"]},
+      {q:"un taureau", a:"ein Stier", wrong:["ein Bulle","ein Ochse","ein Rind"]},
+      {q:"un flamant rose", a:"ein Flamingo", wrong:["ein Pelikan","ein Reiher","ein Ibis"]},
+      {q:"un oiseau", a:"ein Vogel", wrong:["ein Tier","ein Insekt","ein Reptil"]},
+      {q:"observer qn/qc", a:"jdn./etw. beobachten", wrong:["jdn. betrachten","jdn. anschauen","jdn. beobachten"]},
+      {q:"un gardian", a:"ein Viehhirt (in der Camargue)", wrong:["ein Cowboy","ein Hirte","ein Schäfer"]},
+      {q:"garder qn", a:"jdn. bewachen", wrong:["jdn. beschützen","jdn. überwachen","jdn. begleiten"]},
+      {q:"un lieu / des lieux", a:"ein Ort / Orte", wrong:["eine Stelle","ein Platz","eine Lage"]},
+      {q:"l'élevage (m.)", a:"die Viehzucht", wrong:["die Landwirtschaft","die Tierzucht","der Anbau"]},
+      {q:"tellement de (+ Nomen)", a:"so viel(e)", wrong:["so wenige","so viel","so eine Menge"]},
+      {q:"élever qn/qc", a:"jdn. großziehen / (Tiere) züchten", wrong:["aufziehen","ernähren","versorgen"]},
+      {q:"camarguais/camarguaise", a:"aus der Camargue / camargisch", wrong:["provenzalisch","südfranzösisch","okzitanisch"]},
+      {q:"courir après qn/qc", a:"jdm./etw. nachlaufen / hinterherlaufen", wrong:["etw. verfolgen","etw. suchen","etw. fangen"]},
+      {q:"une tradition", a:"eine Tradition", wrong:["ein Brauch","ein Ritual","eine Gewohnheit"]},
+      {q:"une arène", a:"eine (Stierkampf)Arena", wrong:["ein Stadion","ein Amphitheater","ein Ring"]},
+      {q:"une procession", a:"eine Prozession / ein Festumzug", wrong:["eine Parade","ein Umzug","ein Festzug"]},
+      {q:"un Gitan / une Gitane", a:"Mitglied der ethnischen Gruppe der Sinti und Roma", wrong:["ein Nomade","ein Wanderer","ein Zigeuner"]},
+      {q:"une statue", a:"eine Statue", wrong:["eine Skulptur","eine Figur","ein Denkmal"]},
+      {q:"à cheval", a:"mit dem Pferd / auf dem Pferd", wrong:["auf dem Pferd","reitend","auf dem Pferderücken"]},
+      {q:"traditionnel/traditionnelle", a:"traditionell", wrong:["klassisch","alt","üblich"]},
+      {q:"une légende", a:"eine Legende / eine Sage", wrong:["ein Märchen","eine Geschichte","ein Mythos"]},
+      {q:"une ligne", a:"eine Linie", wrong:["ein Strich","eine Kurve","ein Zug"]},
+      {q:"l'avenir (m.)", a:"die Zukunft", wrong:["die Vergangenheit","die Gegenwart","die Zukunftsperspektive"]},
+      {q:"un guitariste / une guitariste", a:"ein Gitarrist / eine Gitarristin", wrong:["ein Musiker","ein Bassist","ein Rockmusiker"]},
+      {q:"un pont", a:"eine Brücke", wrong:["ein Viadukt","ein Steg","ein Übergang"]},
+      {q:"haut/haute", a:"hoch", wrong:["groß","lang","breit"]},
+      {q:"un aqueduc", a:"ein Aquädukt", wrong:["eine Wasserleitung","ein Kanal","ein Wasserwerk"]},
+      {q:"une visite guidée", a:"eine Führung", wrong:["ein Rundgang","eine Tour","ein Besuch"]},
+      {q:"illuminer qc", a:"etw. beleuchten", wrong:["etw. anstrahlen","etw. erhellen","etw. anleuchten"]},
+      {q:"une cigale", a:"eine Zikade", wrong:["eine Grille","ein Käfer","ein Insekt"]},
+      {q:"un cycliste / une cycliste", a:"ein Radfahrer / eine Radfahrerin", wrong:["ein Sportler","ein Läufer","ein Athlet"]},
+      {q:"de toute façon", a:"jedenfalls / sowieso", wrong:["außerdem","trotzdem","sowieso"]},
+      {q:"un spectateur / une spectatrice", a:"ein Zuschauer / eine Zuschauerin", wrong:["ein Beobachter","ein Zuschauer","ein Fan"]},
+      {q:"vendre qc à qn", a:"jdm. etw. verkaufen", wrong:["etw. anbieten","etw. verschenken","etw. geben"]},
+      {q:"un écran", a:"eine Leinwand / ein Bildschirm", wrong:["ein Monitor","ein Display","eine Anzeige"]},
+      {q:"une étape", a:"eine Etappe", wrong:["ein Abschnitt","ein Teilstück","eine Phase"]},
+      {q:"un passage", a:"eine Durchfahrt / ein Durchgang / eine Passage", wrong:["ein Korridor","ein Weg","eine Gasse"]},
+      {q:"distribuer qc", a:"etw. austeilen / etw. verteilen", wrong:["etw. verkaufen","etw. ausgeben","etw. weitergeben"]},
+      {q:"patient/patiente", a:"geduldig", wrong:["ausdauernd","ruhig","besonnen"]},
+      {q:"du côté de", a:"aufseiten (+ Genitiv)", wrong:["neben","bei","in der Nähe von"]},
+      {q:"incroyable/incroyable", a:"unglaublich", wrong:["erstaunlich","unvorstellbar","unbegreiflich"]},
+      {q:"voisin/voisine", a:"Nachbar-", wrong:["benachbart","angrenzend","nahe"]},
+      {q:"un gagnant / une gagnante", a:"ein Gewinner / eine Gewinnerin", wrong:["ein Sieger","ein Champion","ein Erstplatzierter"]},
+      {q:"un maillot", a:"ein Trikot", wrong:["ein Dress","ein Shirt","ein Leibchen"]},
+      {q:"varié/variée", a:"unterschiedlich / abwechslungsreich", wrong:["vielfältig","divers","bunt"]},
+      {q:"un sommet", a:"ein Gipfel", wrong:["eine Spitze","ein Berg","ein Höhepunkt"]},
+      {q:"international/internationale", a:"international", wrong:["global","weltweit","übernational"]},
+      {q:"utile/utile", a:"nützlich", wrong:["praktisch","hilfreich","sinnvoll"]},
+      {q:"un chantier", a:"eine Baustelle / hier: ein Workcamp", wrong:["ein Lager","ein Projekt","ein Einsatz"]},
+      {q:"un fort", a:"eine Festung", wrong:["eine Burg","ein Bollwerk","ein Schutzwall"]},
+      {q:"réparer qc", a:"etw. reparieren", wrong:["etw. flicken","etw. ausbessern","etw. instandsetzen"]},
+      {q:"rénover qc", a:"etw. renovieren", wrong:["etw. sanieren","etw. restaurieren","etw. modernisieren"]},
+      {q:"dur/dure", a:"hart / schwierig", wrong:["schwer","anstrengend","belastend"]},
+      {q:"les loisirs (m. pl.)", a:"die Freizeit", wrong:["das Hobby","die Erholung","die Freizeit"]},
+      {q:"un yacht", a:"eine Yacht", wrong:["ein Segelboot","ein Motorboot","ein Schiff"]},
+      {q:"un selfie", a:"ein Selfie", wrong:["ein Foto","ein Bild","ein Portrait"]},
+      {q:"un photographe / une photographe", a:"ein Fotograf / eine Fotografin", wrong:["ein Kameramann","ein Bildreporter","ein Fotokünstler"]},
+      {q:"un autographe", a:"ein Autogramm", wrong:["eine Unterschrift","ein Signum","eine Signatur"]},
+      {q:"la voile", a:"das Segel / das Segeln", wrong:["das Surfen","das Rudern","das Tauchen"]},
+      {q:"un pro / une pro", a:"ein Profi", wrong:["ein Experte","ein Fachmann","ein Spezialist"]},
+      {q:"un feu d'artifice", a:"ein Feuerwerk", wrong:["ein Leuchtfeuer","ein Lichtspektakel","ein Pyrotechnik"]},
+      {q:"boire la tasse", a:"Wasser schlucken (beim Schwimmen)", wrong:["trinken","ertrinken","untergehen"]},
+      {q:"se faire des amis", a:"Freunde finden", wrong:["Freundschaften schließen","Freunde suchen","Freunde treffen"]},
+      {q:"le wifi", a:"das WLAN", wrong:["das Internet","das Netzwerk","die Verbindung"]},
+      {q:"un vol", a:"hier: ein Flug", wrong:["ein Diebstahl","ein Flug","eine Reise"]},
+      {q:"une tyrolienne", a:"eine Seilrutsche / eine Zipline", wrong:["eine Seilbahn","ein Seil","eine Rutsche"]},
+      {q:"qn a mal au cœur", a:"jdm. ist schlecht", wrong:["jdm. ist kalt","jdm. ist heiß","jdm. ist schwindelig"]},
+    ]
+  }
+];
+
+// ===================== STATE =====================
+let currentSection = null;
+let questions = [];
+let qIndex = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let answered = false;
+let quizDir = 'fr';
+let progress = {};
+let questionModes = [];
+
+// ===================== STORAGE =====================
+function loadProgress() {
+  try { const raw = localStorage.getItem('klett_fr_progress'); if (raw) progress = JSON.parse(raw); } catch(e) { progress = {}; }
+}
+function saveProgress() {
+  try { localStorage.setItem('klett_fr_progress', JSON.stringify(progress)); } catch(e) {}
+}
+function resetStats() {
+  if (!confirm('Fortschritt wirklich zurücksetzen?')) return;
+  progress = {};
+  localStorage.removeItem('klett_fr_progress');
+  renderStats();
+  buildHome();
+}
+
+// ===================== HELPERS =====================
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function setDir(dir) {
+  quizDir = dir;
+  document.getElementById('dirFR').classList.toggle('active', dir === 'fr');
+  document.getElementById('dirDE').classList.toggle('active', dir === 'de');
+}
+
+function normalize(str) {
+  return str.toLowerCase().trim()
+    .replace(/^(der|die|das|ein|eine|einen|dem|den|des|un|une|le|la|les|l')\s+/i, '')
+    .replace(/\s+/g, ' ');
+}
+
+// ===================== HOME =====================
+function buildHome() {
+  const grid = document.getElementById('sectionGrid');
+  grid.innerHTML = '';
+  SECTIONS.forEach(s => {
+    const p = progress[s.id];
+    let badgesHTML = '';
+    if (p && p.attempts > 0) {
+      if (p.perfectCount > 0) badgesHTML += `<span class="sc-badge perfect">🌟 Perfekt ×${p.perfectCount}</span>`;
+      else badgesHTML += `<span class="sc-badge done">✓ Abgeschlossen</span>`;
+      const cls = p.bestPct === 100 ? 'perfect' : p.bestPct >= 60 ? 'done' : 'errors';
+      badgesHTML += `<span class="sc-badge ${cls}">Best: ${p.bestPct}%</span>`;
+      if (p.lastWrong > 0) badgesHTML += `<span class="sc-badge errors">⚠ ${p.lastWrong} Fehler zuletzt</span>`;
+    }
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.innerHTML = `
+      <div class="sc-left">
+        <span class="sc-label">${s.label}</span>
+        <span class="sc-name">${s.name}</span>
+        <span class="sc-count">${s.questions.length} Vokabeln</span>
+        ${badgesHTML ? `<div class="sc-badges">${badgesHTML}</div>` : ''}
+      </div>
+      <span class="arrow">→</span>`;
+    card.style.borderLeftColor = s.color;
+    card.style.borderLeftWidth = '3px';
+    card.onclick = () => startSection(s.id);
+    grid.appendChild(card);
+  });
+}
+function goHome() { buildHome(); showScreen('homeScreen'); }
+
+// ===================== QUIZ =====================
+function startSection(id) {
+  currentSection = SECTIONS.find(s => s.id === id);
+  questions = shuffle(currentSection.questions);
+  questionModes = questions.map(() => Math.random() < 0.5 ? 'mc' : 'text');
+  qIndex = 0; correctCount = 0; wrongCount = 0;
+  const dirLabel = quizDir === 'fr' ? '🇫🇷→🇩🇪' : '🇩🇪→🇫🇷';
+  document.getElementById('quizSectionLabel').innerHTML =
+    `${currentSection.label} · ${currentSection.name}<span class="quiz-dir-badge">${dirLabel}</span>`;
+  updateStats();
+  showScreen('quizScreen');
+  showQuestion();
+}
+
+function updateStats() {
+  document.getElementById('correctCount').textContent = `✓ ${correctCount}`;
+  document.getElementById('wrongCount').textContent = `✗ ${wrongCount}`;
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[qIndex];
+  const mode = questionModes[qIndex];
+  const total = questions.length;
+  const questionText = quizDir === 'fr' ? q.q : q.a;
+  const answerText   = quizDir === 'fr' ? q.a : q.q;
+  const wrongOpts = quizDir === 'fr'
+    ? q.wrong.slice(0, 3)
+    : shuffle(questions.filter((_, i) => i !== qIndex)).slice(0, 3).map(o => o.q);
+
+  document.getElementById('progressFill').style.width = `${(qIndex / total) * 100}%`;
+  document.getElementById('questionNum').textContent = `Frage ${qIndex + 1} von ${total}`;
+  document.getElementById('questionText').textContent = questionText;
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('nextBtn').className = 'next-btn';
+
+  const area = document.getElementById('answersArea');
+  area.innerHTML = '';
+
+  const badge = document.createElement('div');
+  if (mode === 'mc') {
+    badge.className = 'mode-badge mc';
+    badge.textContent = '▤ Multiple Choice';
+  } else {
+    badge.className = 'mode-badge text';
+    badge.textContent = '✏ Eingabe';
+  }
+  area.appendChild(badge);
+
+  if (mode === 'mc') {
+    const opts = shuffle([answerText, ...wrongOpts]);
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => checkMC(btn, opt, answerText, grid);
+      grid.appendChild(btn);
+    });
+    area.appendChild(grid);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'text-input-wrap';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'text-input';
+    input.placeholder = quizDir === 'fr' ? 'Auf Deutsch eingeben …' : 'En français …';
+    input.autocomplete = 'off';
+    input.autocorrect = 'off';
+    input.spellcheck = false;
+    const btn = document.createElement('button');
+    btn.className = 'submit-btn';
+    btn.textContent = 'OK';
+    const submit = () => checkText(input, answerText);
+    btn.onclick = submit;
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    wrap.appendChild(input);
+    wrap.appendChild(btn);
+    area.appendChild(wrap);
+    setTimeout(() => input.focus(), 80);
+  }
+}
+
+function checkMC(btn, chosen, correct, grid) {
+  if (answered) return;
+  answered = true;
+  grid.querySelectorAll('.option-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+  });
+  if (chosen !== correct) { btn.classList.remove('correct'); btn.classList.add('wrong'); }
+  showFeedback(chosen === correct, correct);
+}
+
+function checkText(input, correct) {
+  if (answered) return;
+  answered = true;
+  input.disabled = true;
+  const btn = input.parentElement.querySelector('.submit-btn');
+  if (btn) btn.disabled = true;
+
+  const userVal = input.value.trim();
+  const correctParts = correct.split('/').map(p => p.trim());
+  const isCorrect = correctParts.some(part => normalize(userVal) === normalize(part))
+    || normalize(userVal) === normalize(correct);
+
+  input.classList.add(isCorrect ? 'correct' : 'wrong');
+  showFeedback(isCorrect, correct);
+}
+
+function showFeedback(isCorrect, correct) {
+  if (isCorrect) {
+    correctCount++;
+    document.getElementById('feedback').textContent = '✓ Richtig!';
+    document.getElementById('feedback').className = 'feedback correct show';
+  } else {
+    wrongCount++;
+    document.getElementById('feedback').textContent = `✗ Richtige Antwort: ${correct}`;
+    document.getElementById('feedback').className = 'feedback wrong show';
+  }
+  updateStats();
+  document.getElementById('nextBtn').className = 'next-btn show';
+}
+
+function nextQuestion() {
+  qIndex++;
+  if (qIndex >= questions.length) showResult();
+  else showQuestion();
+}
+
+function showResult() {
+  const total = questions.length;
+  const pct = Math.round((correctCount / total) * 100);
+  const isPerfect = wrongCount === 0;
+  const prev = progress[currentSection.id] || { attempts: 0, perfectCount: 0, bestPct: 0 };
+  const prevBest = prev.bestPct || 0;
+
+  progress[currentSection.id] = {
+    attempts: (prev.attempts || 0) + 1,
+    perfectCount: (prev.perfectCount || 0) + (isPerfect ? 1 : 0),
+    bestPct: Math.max(prevBest, pct),
+    lastWrong: wrongCount,
+  };
+  saveProgress();
+
+  const emoji = pct === 100 ? '🌟' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
+  const title = pct === 100 ? 'Parfait!' : pct >= 80 ? 'Très bien!' : pct >= 60 ? 'Bien fait!' : pct >= 40 ? 'Continue!' : 'Tu peux le faire!';
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSub').textContent = `${currentSection.label} · ${currentSection.name}`;
+  document.getElementById('resultScore').textContent = pct + '%';
+  document.getElementById('finalCorrect').textContent = correctCount;
+  document.getElementById('finalWrong').textContent = wrongCount;
+  document.getElementById('finalTotal').textContent = total;
+  document.getElementById('perfectBanner').className = isPerfect ? 'result-perfect-banner show' : 'result-perfect-banner';
+
+  const prevEl = document.getElementById('resultPrev');
+  if (prev.attempts > 0) {
+    prevEl.innerHTML = pct > prevBest
+      ? `🆙 Neuer Rekord! Vorher: <span>${prevBest}%</span>`
+      : `Vorheriger Rekord: <span>${prevBest}%</span> · Versuche: <span>${progress[currentSection.id].attempts}</span>`;
+  } else {
+    prevEl.textContent = '🎯 Premiere Runde dieser Unité!';
+  }
+
+  showScreen('resultScreen');
+}
+
+function restartQuiz() { startSection(currentSection.id); }
+
+// ===================== STATS MODAL =====================
+function openStats() { renderStats(); document.getElementById('statsOverlay').classList.add('open'); }
+function closeStats() { document.getElementById('statsOverlay').classList.remove('open'); }
+function closeStatsOutside(e) { if (e.target === document.getElementById('statsOverlay')) closeStats(); }
+
+function renderStats() {
+  const el = document.getElementById('statsContent');
+  const entries = SECTIONS.filter(s => progress[s.id] && progress[s.id].attempts > 0);
+  if (!entries.length) {
+    el.innerHTML = '<div class="stats-empty">Noch keine Unités abgeschlossen.<br>Starte dein erstes Quiz! 🚀</div>';
+    return;
+  }
+  el.innerHTML = entries.map(s => {
+    const p = progress[s.id];
+    const cls = p.bestPct === 100 ? 'green' : p.bestPct >= 60 ? 'orange' : 'red';
+    const stars = p.perfectCount > 0 ? ` · 🌟×${p.perfectCount}` : '';
+    const errBadge = p.lastWrong === 0
+      ? `<span class="sc-badge perfect" style="font-size:11px">✓ Zuletzt fehlerfrei</span>`
+      : `<span class="sc-badge errors" style="font-size:11px">⚠ ${p.lastWrong} Fehler zuletzt</span>`;
+    return `<div class="stats-row">
+      <div class="stats-row-left">
+        <span class="stats-row-label">${s.label}</span>
+        <span class="stats-row-name">${s.name}</span>
+        <div class="sc-badges" style="margin-top:4px">${errBadge}</div>
+      </div>
+      <div class="stats-row-right">
+        <span class="stats-score-big ${cls}">${p.bestPct}%</span>
+        <span class="stats-attempts">${p.attempts} Versuch${p.attempts !== 1 ? 'e' : ''}${stars}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===================== INIT =====================
+loadProgress();
+buildHome();
+</script>
+</body>
+</html>
