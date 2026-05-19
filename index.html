@@ -105,11 +105,22 @@
   .stat-pill.correct-stat { color: var(--correct); border-color: rgba(76,219,138,0.3); }
   .stat-pill.wrong-stat { color: var(--wrong); border-color: rgba(247,106,106,0.3); }
 
-  .progress-bar { height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 32px; }
+  .progress-bar { height: 4px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
   .progress-fill {
     height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
     border-radius: 4px; transition: width 0.4s ease;
   }
+
+  .round-info {
+    font-size: 12px; color: var(--muted); text-align: right; margin-bottom: 24px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .round-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .round-badge.first { background: rgba(74,158,247,0.18); color: #6bb4f9; border: 1px solid rgba(74,158,247,0.3); }
+  .round-badge.retry { background: rgba(247,162,106,0.18); color: #f7a26a; border: 1px solid rgba(247,162,106,0.35); }
 
   .quiz-section-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
 
@@ -179,6 +190,21 @@
   .next-btn:hover { opacity: 0.9; }
   .next-btn.show { display: block; animation: fadeIn 0.3s; }
 
+  /* Retry round banner */
+  .retry-banner {
+    background: rgba(247,162,106,0.12); border: 1px solid rgba(247,162,106,0.35);
+    border-radius: 16px; padding: 20px 24px; margin-bottom: 20px;
+    text-align: center; animation: fadeIn 0.4s;
+  }
+  .retry-banner-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: #f7a26a; margin-bottom: 6px; }
+  .retry-banner-sub { font-size: 14px; color: var(--muted); }
+  .retry-continue-btn {
+    margin-top: 16px; background: rgba(247,162,106,0.2); border: 1px solid rgba(247,162,106,0.5);
+    color: #f7a26a; border-radius: 10px; padding: 10px 24px; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .retry-continue-btn:hover { background: rgba(247,162,106,0.3); }
+
   .result-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
     padding: 40px 32px; text-align: center;
@@ -192,12 +218,23 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     margin-bottom: 24px;
   }
-  .result-details { display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; }
+  .result-details { display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
   .result-detail { display: flex; flex-direction: column; gap: 4px; align-items: center; }
   .rd-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
   .rd-label { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
   .rd-correct .rd-num { color: var(--correct); }
   .rd-wrong .rd-num { color: var(--wrong); }
+
+  .result-rounds {
+    background: var(--surface2); border-radius: 12px; padding: 14px 18px;
+    margin-bottom: 24px; font-size: 13px; color: var(--muted); text-align: left;
+  }
+  .result-rounds-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+  .round-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .round-row:last-child { border-bottom: none; }
+  .round-row .rr-label { color: var(--muted); }
+  .round-row .rr-val { color: var(--text); font-weight: 600; }
+  .round-row .rr-val.perfect { color: var(--correct); }
 
   .restart-btn {
     background: var(--accent); border: none; color: white; border-radius: 12px;
@@ -307,14 +344,28 @@
       </div>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="quiz-section-label" id="quizSectionLabel"></div>
-    <div class="question-card">
-      <div class="question-num" id="questionNum"></div>
-      <div class="question-text" id="questionText"></div>
+    <div class="round-info">
+      <span id="roundBadge" class="round-badge first">Runde 1</span>
+      <span id="progressInfo"></span>
     </div>
-    <div id="answersArea"></div>
-    <div class="feedback" id="feedback"></div>
-    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Suivant →</button>
+    <div class="quiz-section-label" id="quizSectionLabel"></div>
+
+    <!-- Retry banner (shown between rounds) -->
+    <div class="retry-banner" id="retryBanner" style="display:none">
+      <div class="retry-banner-title" id="retryTitle"></div>
+      <div class="retry-banner-sub" id="retrySub"></div>
+      <button class="retry-continue-btn" onclick="startNextRound()">Nochmal üben →</button>
+    </div>
+
+    <div id="quizContent">
+      <div class="question-card">
+        <div class="question-num" id="questionNum"></div>
+        <div class="question-text" id="questionText"></div>
+      </div>
+      <div id="answersArea"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Suivant →</button>
+    </div>
   </div>
 
   <!-- RESULT -->
@@ -323,14 +374,16 @@
       <div class="result-emoji" id="resultEmoji">🎉</div>
       <div class="result-title" id="resultTitle">Bravo!</div>
       <div class="result-sub" id="resultSub"></div>
-      <div class="result-perfect-banner" id="perfectBanner">🌟 Perfekte Runde – kein einziger Fehler!</div>
+      <div class="result-perfect-banner" id="perfectBanner">🌟 Alle Vokabeln gemeistert – perfekte Runde!</div>
       <div class="result-score" id="resultScore">0%</div>
       <div class="result-prev" id="resultPrev"></div>
       <div class="result-details">
         <div class="result-detail rd-correct"><div class="rd-num" id="finalCorrect">0</div><div class="rd-label">Richtig</div></div>
         <div class="result-detail rd-wrong"><div class="rd-num" id="finalWrong">0</div><div class="rd-label">Falsch</div></div>
         <div class="result-detail"><div class="rd-num" id="finalTotal">0</div><div class="rd-label">Gesamt</div></div>
+        <div class="result-detail"><div class="rd-num" id="finalRounds">1</div><div class="rd-label">Runden</div></div>
       </div>
+      <div class="result-rounds" id="resultRoundsDetail"></div>
       <div>
         <button class="restart-btn" onclick="restartQuiz()">Nochmal</button>
         <button class="home-btn" onclick="goHome()">Alle Unités</button>
@@ -473,7 +526,6 @@ const SECTIONS = [
       {q:"pardonner qc à qn", a:"jdm. etw. verzeihen", wrong:["jdn. bestrafen","jdn. anklagen","jdn. ignorieren"]},
       {q:"accuser qn", a:"jdn. anklagen", wrong:["jdn. loben","jdn. befreien","jdn. verteidigen"]},
       {q:"la police", a:"die Polizei", wrong:["die Feuerwehr","das Gericht","die Armee"]},
-      {q:"garder qc", a:"etw. behalten", wrong:["etw. wegwerfen","etw. verschenken","etw. verkaufen"]},
       {q:"courir", a:"rennen", wrong:["gehen","schleichen","springen"]},
       {q:"éclater de rire", a:"in Gelächter ausbrechen", wrong:["zu weinen beginnen","zu schreien beginnen","still werden"]},
       {q:"pendant que", a:"während (Konjunktion)", wrong:["weil","obwohl","wenn"]},
@@ -891,7 +943,8 @@ const SECTIONS = [
 
 // ===================== STATE =====================
 let currentSection = null;
-let questions = [];
+let allQuestions = [];       // all questions of the section (shuffled once)
+let questions = [];          // current round's questions
 let qIndex = 0;
 let correctCount = 0;
 let wrongCount = 0;
@@ -899,6 +952,12 @@ let answered = false;
 let quizDir = 'fr';
 let progress = {};
 let questionModes = [];
+
+// Retry / round state
+let roundNum = 1;
+let wrongInRound = [];       // indices of original questions answered wrong this round
+let roundLog = [];           // [{round, total, wrong}] for result screen
+let totalCorrectFirst = 0;   // correct on first attempt (for % score)
 
 // ===================== STORAGE =====================
 function loadProgress() {
@@ -926,7 +985,6 @@ function setDir(dir) {
   document.getElementById('dirFR').classList.toggle('active', dir === 'fr');
   document.getElementById('dirDE').classList.toggle('active', dir === 'de');
 }
-
 function normalize(str) {
   return str.toLowerCase().trim()
     .replace(/^(der|die|das|ein|eine|einen|dem|den|des|un|une|le|la|les|l')\s+/i, '')
@@ -968,20 +1026,62 @@ function goHome() { buildHome(); showScreen('homeScreen'); }
 // ===================== QUIZ =====================
 function startSection(id) {
   currentSection = SECTIONS.find(s => s.id === id);
-  questions = shuffle(currentSection.questions);
-  questionModes = questions.map(() => Math.random() < 0.5 ? 'mc' : 'text');
+  allQuestions = shuffle(currentSection.questions);
+  questions = [...allQuestions];
+  roundNum = 1;
+  roundLog = [];
+  wrongInRound = [];
+  totalCorrectFirst = 0;
   qIndex = 0; correctCount = 0; wrongCount = 0;
+
   const dirLabel = quizDir === 'fr' ? '🇫🇷→🇩🇪' : '🇩🇪→🇫🇷';
   document.getElementById('quizSectionLabel').innerHTML =
     `${currentSection.label} · ${currentSection.name}<span class="quiz-dir-badge">${dirLabel}</span>`;
+
+  assignModes();
   updateStats();
+  updateRoundUI();
+  showRetryBanner(false);
   showScreen('quizScreen');
   showQuestion();
+}
+
+function assignModes() {
+  questionModes = questions.map(() => Math.random() < 0.5 ? 'mc' : 'text');
+}
+
+function updateRoundUI() {
+  const badge = document.getElementById('roundBadge');
+  if (roundNum === 1) {
+    badge.className = 'round-badge first';
+    badge.textContent = 'Runde 1';
+  } else {
+    badge.className = 'round-badge retry';
+    badge.textContent = `Wiederholung ${roundNum - 1}`;
+  }
+}
+
+function showRetryBanner(show, wrongCount) {
+  const banner = document.getElementById('retryBanner');
+  const content = document.getElementById('quizContent');
+  if (show) {
+    document.getElementById('retryTitle').textContent =
+      `${wrongCount} Vokabel${wrongCount !== 1 ? 'n' : ''} noch nicht sicher! 💪`;
+    document.getElementById('retrySub').textContent =
+      `Diese kommen jetzt nochmal – weiter bis du alle kannst!`;
+    banner.style.display = 'block';
+    content.style.display = 'none';
+  } else {
+    banner.style.display = 'none';
+    content.style.display = 'block';
+  }
 }
 
 function updateStats() {
   document.getElementById('correctCount').textContent = `✓ ${correctCount}`;
   document.getElementById('wrongCount').textContent = `✗ ${wrongCount}`;
+  document.getElementById('progressInfo').textContent =
+    `${qIndex + 1} / ${questions.length}`;
 }
 
 function showQuestion() {
@@ -993,10 +1093,14 @@ function showQuestion() {
   const answerText   = quizDir === 'fr' ? q.a : q.q;
   const wrongOpts = quizDir === 'fr'
     ? q.wrong.slice(0, 3)
-    : shuffle(questions.filter((_, i) => i !== qIndex)).slice(0, 3).map(o => o.q);
+    : shuffle(allQuestions.filter(o => o !== q)).slice(0, 3).map(o => o.q);
 
   document.getElementById('progressFill').style.width = `${(qIndex / total) * 100}%`;
-  document.getElementById('questionNum').textContent = `Frage ${qIndex + 1} von ${total}`;
+  document.getElementById('progressInfo').textContent = `${qIndex + 1} / ${total}`;
+  document.getElementById('questionNum').textContent =
+    roundNum === 1
+      ? `Frage ${qIndex + 1} von ${total}`
+      : `Wiederholung – Frage ${qIndex + 1} von ${total}`;
   document.getElementById('questionText').textContent = questionText;
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('feedback').textContent = '';
@@ -1080,10 +1184,12 @@ function checkText(input, correct) {
 function showFeedback(isCorrect, correct) {
   if (isCorrect) {
     correctCount++;
+    if (roundNum === 1) totalCorrectFirst++;
     document.getElementById('feedback').textContent = '✓ Richtig!';
     document.getElementById('feedback').className = 'feedback correct show';
   } else {
     wrongCount++;
+    wrongInRound.push(questions[qIndex]);
     document.getElementById('feedback').textContent = `✗ Richtige Antwort: ${correct}`;
     document.getElementById('feedback').className = 'feedback wrong show';
   }
@@ -1093,14 +1199,43 @@ function showFeedback(isCorrect, correct) {
 
 function nextQuestion() {
   qIndex++;
-  if (qIndex >= questions.length) showResult();
-  else showQuestion();
+  if (qIndex >= questions.length) {
+    endRound();
+  } else {
+    showQuestion();
+  }
+}
+
+function endRound() {
+  roundLog.push({ round: roundNum, total: questions.length, wrong: wrongInRound.length });
+
+  if (wrongInRound.length === 0) {
+    showResult();
+  } else {
+    // prepare retry round
+    showRetryBanner(true, wrongInRound.length);
+  }
+}
+
+function startNextRound() {
+  questions = shuffle(wrongInRound);
+  wrongInRound = [];
+  roundNum++;
+  qIndex = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  assignModes();
+  updateRoundUI();
+  showRetryBanner(false);
+  updateStats();
+  showQuestion();
 }
 
 function showResult() {
-  const total = questions.length;
-  const pct = Math.round((correctCount / total) * 100);
-  const isPerfect = wrongCount === 0;
+  const total = allQuestions.length;
+  const pct = Math.round((totalCorrectFirst / total) * 100);
+  const totalWrongEver = roundLog.reduce((s, r) => s + r.wrong, 0);
+  const isPerfect = totalWrongEver === 0;
   const prev = progress[currentSection.id] || { attempts: 0, perfectCount: 0, bestPct: 0 };
   const prevBest = prev.bestPct || 0;
 
@@ -1108,21 +1243,40 @@ function showResult() {
     attempts: (prev.attempts || 0) + 1,
     perfectCount: (prev.perfectCount || 0) + (isPerfect ? 1 : 0),
     bestPct: Math.max(prevBest, pct),
-    lastWrong: wrongCount,
+    lastWrong: totalWrongEver,
   };
   saveProgress();
 
-  const emoji = pct === 100 ? '🌟' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
-  const title = pct === 100 ? 'Parfait!' : pct >= 80 ? 'Très bien!' : pct >= 60 ? 'Bien fait!' : pct >= 40 ? 'Continue!' : 'Tu peux le faire!';
+  const emoji = isPerfect ? '🌟' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
+  const title = isPerfect ? 'Parfait!' : pct >= 80 ? 'Très bien!' : pct >= 60 ? 'Bien fait!' : 'Continue!';
 
   document.getElementById('resultEmoji').textContent = emoji;
   document.getElementById('resultTitle').textContent = title;
   document.getElementById('resultSub').textContent = `${currentSection.label} · ${currentSection.name}`;
   document.getElementById('resultScore').textContent = pct + '%';
-  document.getElementById('finalCorrect').textContent = correctCount;
-  document.getElementById('finalWrong').textContent = wrongCount;
+  document.getElementById('finalCorrect').textContent = totalCorrectFirst;
+  document.getElementById('finalWrong').textContent = total - totalCorrectFirst;
   document.getElementById('finalTotal').textContent = total;
+  document.getElementById('finalRounds').textContent = roundNum;
   document.getElementById('perfectBanner').className = isPerfect ? 'result-perfect-banner show' : 'result-perfect-banner';
+
+  // rounds detail
+  const roundsEl = document.getElementById('resultRoundsDetail');
+  if (roundNum === 1 && isPerfect) {
+    roundsEl.innerHTML = `<div class="result-rounds-title">Rundendetails</div>
+      <div class="round-row"><span class="rr-label">Runde 1</span><span class="rr-val perfect">Alle richtig! 🌟</span></div>`;
+  } else {
+    let html = `<div class="result-rounds-title">Rundendetails</div>`;
+    roundLog.forEach(r => {
+      const cls = r.wrong === 0 ? 'perfect' : '';
+      const txt = r.wrong === 0 ? 'Alle richtig ✓' : `${r.wrong} Fehler`;
+      html += `<div class="round-row">
+        <span class="rr-label">${r.round === 1 ? 'Runde 1' : `Wiederholung ${r.round - 1}`} (${r.total} Vokabeln)</span>
+        <span class="rr-val ${cls}">${txt}</span>
+      </div>`;
+    });
+    roundsEl.innerHTML = html;
+  }
 
   const prevEl = document.getElementById('resultPrev');
   if (prev.attempts > 0) {
@@ -1130,7 +1284,7 @@ function showResult() {
       ? `🆙 Neuer Rekord! Vorher: <span>${prevBest}%</span>`
       : `Vorheriger Rekord: <span>${prevBest}%</span> · Versuche: <span>${progress[currentSection.id].attempts}</span>`;
   } else {
-    prevEl.textContent = '🎯 Premiere Runde dieser Unité!';
+    prevEl.textContent = '🎯 Première Runde dieser Unité!';
   }
 
   showScreen('resultScreen');
