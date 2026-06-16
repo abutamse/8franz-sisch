@@ -90,6 +90,21 @@
   .section-card .sc-count { font-size: 13px; color: var(--muted); }
   .section-card .arrow { color: var(--accent); font-size: 20px; opacity: 0.6; }
 
+  /* Special highlight for Schulaufgaben card */
+  .section-card.schulaufgaben-card {
+    border: 2px solid rgba(176,106,247,0.5);
+    background: linear-gradient(135deg, rgba(176,106,247,0.08), var(--surface));
+  }
+  .section-card.schulaufgaben-card:hover {
+    border-color: rgba(176,106,247,0.8);
+    background: linear-gradient(135deg, rgba(176,106,247,0.15), var(--surface2));
+  }
+  .schulaufgaben-badge {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 20px; margin-top: 4px;
+    background: rgba(176,106,247,0.2); color: #c99cf7; border: 1px solid rgba(176,106,247,0.4);
+  }
+
   .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
   .quiz-back {
     background: var(--surface); border: 1px solid var(--border); color: var(--text);
@@ -190,7 +205,6 @@
   .next-btn:hover { opacity: 0.9; }
   .next-btn.show { display: block; animation: fadeIn 0.3s; }
 
-  /* Retry round banner */
   .retry-banner {
     background: rgba(247,162,106,0.12); border: 1px solid rgba(247,162,106,0.35);
     border-radius: 16px; padding: 20px 24px; margin-bottom: 20px;
@@ -350,7 +364,6 @@
     </div>
     <div class="quiz-section-label" id="quizSectionLabel"></div>
 
-    <!-- Retry banner (shown between rounds) -->
     <div class="retry-banner" id="retryBanner" style="display:none">
       <div class="retry-banner-title" id="retryTitle"></div>
       <div class="retry-banner-sub" id="retrySub"></div>
@@ -938,13 +951,159 @@ const SECTIONS = [
       {q:"une tyrolienne", a:"eine Seilrutsche", wrong:["eine Seilbahn","ein Seil","eine Rutsche"]},
       {q:"qn a mal au cœur", a:"jdm. ist schlecht", wrong:["jdm. ist kalt","jdm. ist heiß","jdm. ist schwindelig"]},
     ]
+  },
+  {
+    id: "schulaufgaben", label: "Schulaufgaben", name: "Unité 4–5 Vokabeln", color: "#b06af7",
+    questions: [
+      {q:"un séjour", a:"ein Aufenthalt", wrong:["eine Reise","ein Urlaub","ein Besuch"]},
+      {q:"un voisin", a:"ein Nachbar", wrong:["ein Freund","ein Bekannter","ein Mitbewohner"]},
+      {q:"un échange scolaire", a:"ein Schüleraustausch", wrong:["ein Schulausflug","ein Schulprojekt","ein Schulwettbewerb"]},
+      {q:"un correspondant", a:"ein Brieffreund", wrong:["ein Schulfreund","ein Klassenkamerad","ein Mitschüler"]},
+      {q:"s'informer sur qc", a:"sich über etwas informieren", wrong:["etw. lernen","etw. studieren","etw. recherchieren"]},
+      {q:"un programme", a:"ein Programm", wrong:["ein Plan","ein Ablauf","ein Zeitplan"]},
+      {q:"un car", a:"ein Reisebus", wrong:["ein Bus","ein Zug","ein Taxi"]},
+      {q:"se trouver", a:"sich befinden", wrong:["sich treffen","sich finden","sich verstecken"]},
+      {q:"qu'est-ce qui?", a:"Was? (Fragepronomen, Subjekt ist eine Sache)", wrong:["Wer … ?","Was … ? (Objekt)","Wie … ?"]},
+      {q:"un quiz", a:"ein Quiz", wrong:["ein Test","eine Prüfung","ein Rätsel"]},
+      {q:"qu'est-ce que?", a:"Wen?", wrong:["Was … ?","Wer … ?","Wie … ?"]},
+      {q:"un camembert", a:"ein Camembert", wrong:["ein Brie","ein Gouda","ein Emmentaler"]},
+      {q:"une côte", a:"eine Küste", wrong:["eine Bucht","ein Strand","ein Ufer"]},
+      {q:"normand", a:"normannisch", wrong:["bretonisch","provenzalisch","elsässisch"]},
+      {q:"une tapisserie", a:"ein Wandteppich", wrong:["ein Gemälde","ein Poster","eine Stickerei"]},
+      {q:"une conquête", a:"eine Eroberung", wrong:["eine Entdeckung","eine Reise","ein Sieg"]},
+      {q:"l'Angleterre", a:"England", wrong:["Großbritannien","Irland","Wales"]},
+      {q:"un débarquement", a:"eine Landung (eines Schiffes)", wrong:["eine Ankunft","ein Angriff","eine Invasion"]},
+      {q:"un mont", a:"ein kleiner Berg", wrong:["ein Hügel","ein Gipfel","ein Berg"]},
+      {q:"se perdre", a:"sich verlaufen", wrong:["sich finden","sich treffen","sich auskennen"]},
+      {q:"dépenser (de l'argent)", a:"(Geld) ausgeben", wrong:["Geld verdienen","Geld sparen","Geld wechseln"]},
+      {q:"se débrouiller", a:"zurechtkommen", wrong:["scheitern","aufgeben","verlieren"]},
+      {q:"un contact", a:"ein Kontakt", wrong:["eine Verbindung","eine Beziehung","ein Bekannter"]},
+      {q:"poli", a:"höflich", wrong:["unhöflich","freundlich","nett"]},
+      {q:"une valise", a:"ein Koffer", wrong:["eine Tasche","ein Rucksack","eine Reisetasche"]},
+      {q:"un souci", a:"eine Sorge", wrong:["ein Problem","ein Kummer","eine Angst"]},
+      {q:"gros", a:"schwer", wrong:["klein","leicht","dünn"]},
+      {q:"des fringues", a:"Klamotten", wrong:["Kleidung","Sachen","Garderobe"]},
+      {q:"dingue", a:"verrückt", wrong:["cool","toll","super"]},
+      {q:"le ventre", a:"der Bauch", wrong:["der Magen","die Hüfte","das Becken"]},
+      {q:"oser faire qc", a:"etwas wagen", wrong:["müssen etw. zu tun","können etw. zu tun","wollen etw. zu tun"]},
+      {q:"avoir la dalle", a:"Kohldampf haben", wrong:["satt sein","Hunger haben","durstig sein"]},
+      {q:"un poisson", a:"ein Fisch", wrong:["ein Meerestier","ein Tintenfisch","ein Krebs"]},
+      {q:"délicieux", a:"lecker", wrong:["gut","schön","toll"]},
+      {q:"un petit copain", a:"ein fester Freund", wrong:["ein Bekannter","ein Schulfreund","ein Nachbar"]},
+      {q:"gêné", a:"verlegen", wrong:["traurig","überrascht","enttäuscht"]},
+      {q:"qc arrive à qn", a:"etw. passiert jdm.", wrong:["etw. gehört jdm.","etw. gefällt jdm.","etw. fehlt jdm."]},
+      {q:"éviter qc", a:"etw. vermeiden", wrong:["etw. suchen","etw. riskieren","etw. wagen"]},
+      {q:"débile", a:"dämlich", wrong:["klug","dumm","blöd"]},
+      {q:"méchant", a:"gemein", wrong:["freundlich","nett","lieb"]},
+      {q:"une abbaye", a:"eine Abtei", wrong:["ein Kloster","eine Kathedrale","eine Kirche"]},
+      {q:"impressionnant", a:"beeindruckend", wrong:["überraschend","erstaunlich","unglaublich"]},
+      {q:"un poison", a:"ein Gift", wrong:["ein Schmerzmittel","ein Medikament","eine Droge"]},
+      {q:"une faute", a:"ein Fehler", wrong:["ein Irrtum","ein Missverständnis","ein Problem"]},
+      {q:"gentil", a:"nett", wrong:["freundlich","höflich","lieb"]},
+      {q:"une compétition", a:"ein Wettkampf", wrong:["ein Turnier","ein Wettbewerb","ein Spiel"]},
+      {q:"un char à voile", a:"ein Strandsegler", wrong:["ein Segelboot","ein Drachen","ein Windsurfer"]},
+      {q:"un carnet", a:"ein Notizbuch", wrong:["ein Tagebuch","ein Heft","ein Block"]},
+      {q:"un carnet de voyage", a:"ein Reisetagebuch", wrong:["ein Reiseführer","ein Reiseplan","ein Reisebericht"]},
+      {q:"une infusion", a:"ein Kräutertee", wrong:["ein Tee","ein Aufguss","ein Heißgetränk"]},
+      {q:"un thé", a:"ein Tee", wrong:["ein Kaffee","ein Kakao","ein Tisane"]},
+      {q:"des herbes", a:"Kräuter", wrong:["Gewürze","Pflanzen","Blätter"]},
+      {q:"un hôpital", a:"ein Krankenhaus", wrong:["eine Klinik","eine Arztpraxis","eine Notaufnahme"]},
+      {q:"malade", a:"krank", wrong:["verletzt","erschöpft","müde"]},
+      {q:"faux", a:"falsch", wrong:["richtig","wahr","echt"]},
+      {q:"un niveau", a:"ein Niveau", wrong:["eine Ebene","eine Schicht","ein Grad"]},
+      {q:"une soirée", a:"ein Abend (im Verlauf)", wrong:["eine Nacht","ein Nachmittag","ein Abend"]},
+      {q:"touristique", a:"touristisch", wrong:["historisch","kulturell","regional"]},
+      {q:"une baie", a:"eine Bucht", wrong:["eine Küste","ein Strand","eine Felsbucht"]},
+      {q:"un panneau", a:"ein Schild", wrong:["ein Plakat","ein Schriftzug","ein Wegweiser"]},
+      {q:"un danger", a:"eine Gefahr", wrong:["ein Risiko","ein Problem","eine Bedrohung"]},
+      {q:"exactement", a:"genau", wrong:["fast","ungefähr","wirklich"]},
+      {q:"les marées", a:"die Gezeiten", wrong:["die Wellen","die Strömung","der Tidenhub"]},
+      {q:"obligatoir", a:"obligatorisch", wrong:["freiwillig","optional","empfohlen"]},
+      {q:"passer (un examen)", a:"eine (Prüfung) ablegen", wrong:["eine Prüfung bestehen","eine Prüfung schreiben","eine Prüfung wiederholen"]},
+      {q:"se promener", a:"spazieren gehen", wrong:["gehen","laufen","wandern"]},
+      {q:"un mètre", a:"ein Meter", wrong:["ein Kilometer","ein Zentimeter","ein Dezimeter"]},
+      {q:"par", a:"durch", wrong:["für","von","über"]},
+      {q:"un duc", a:"ein Herzog", wrong:["ein König","ein Graf","ein Fürst"]},
+      {q:"un cheval", a:"ein Pferd", wrong:["ein Esel","ein Pony","ein Maultier"]},
+      {q:"se battre", a:"kämpfen", wrong:["streiten","diskutieren","wetteifern"]},
+      {q:"une victoire", a:"ein Sieg", wrong:["eine Niederlage","ein Unentschieden","ein Erfolg"]},
+      {q:"un roi", a:"ein König", wrong:["ein Kaiser","ein Fürst","ein Prinz"]},
+      {q:"une scène", a:"eine Szene", wrong:["ein Akt","ein Bild","ein Teil"]},
+      {q:"le Moyen Âge", a:"das Mittelalter", wrong:["die Antike","die Neuzeit","die Moderne"]},
+      {q:"la construction", a:"der Bau", wrong:["die Zerstörung","die Renovierung","die Restaurierung"]},
+      {q:"mondial", a:"weltweit", wrong:["national","international","global"]},
+      {q:"un soldat", a:"ein Soldat", wrong:["ein Offizier","ein General","ein Kämpfer"]},
+      {q:"libérer qn", a:"jemanden befreien", wrong:["jemanden einsperren","jemanden gefangen nehmen","jemanden festhalten"]},
+      {q:"l'occupation nazie", a:"die Nazibesatzung", wrong:["die Besatzung","die Invasion","die Okkupation"]},
+      {q:"un bloc de béton", a:"ein Betonblock", wrong:["ein Betonwall","ein Bunker","ein Betonwürfel"]},
+      {q:"les Alliés", a:"die Alliierten", wrong:["die Verbündeten","die Partner","die Koalition"]},
+      {q:"diriger qc", a:"etwas steuern", wrong:["etw. führen","etw. leiten","etw. kontrollieren"]},
+      {q:"s'entraîner", a:"trainieren", wrong:["üben","vorbereiten","sportlich sein"]},
+      {q:"une roue", a:"ein Rad", wrong:["ein Reifen","eine Felge","eine Achse"]},
+      {q:"se blesser", a:"sich verletzen", wrong:["sich erholen","sich ausruhen","sich wärmen"]},
+      {q:"bouger qc", a:"etwas bewegen", wrong:["etw. heben","etw. tragen","etw. schieben"]},
+      {q:"les urgences", a:"die Notaufnahme", wrong:["der Notarzt","das Krankenhaus","der Sanitäter"]},
+      {q:"un médecin", a:"ein Arzt", wrong:["ein Sanitäter","ein Pfleger","ein Apotheker"]},
+      {q:"une foulure", a:"eine Verstauchung", wrong:["ein Bruch","eine Zerrung","eine Prellung"]},
+      {q:"un patient", a:"ein Patient", wrong:["ein Kunde","ein Besucher","ein Gast"]},
+      {q:"prendre rendez-vous avec qn", a:"einen Termin mit jemandem vereinbaren", wrong:["jdn. besuchen","jdn. anrufen","jdn. einladen"]},
+      {q:"un docteur", a:"ein Arzt", wrong:["ein Chirurg","ein Spezialist","ein Facharzt"]},
+      {q:"urgent", a:"dringend", wrong:["wichtig","notwendig","eilig"]},
+      {q:"la gorge", a:"der Hals", wrong:["der Nacken","die Kehle","die Gurgel"]},
+      {q:"la fièvre", a:"das Fieber", wrong:["die Erkältung","die Grippe","die Entzündung"]},
+      {q:"une ordonnance", a:"ein Rezept (vom Arzt)", wrong:["ein Rezept (Kochen)","ein Attest","ein Gutachten"]},
+      {q:"une maladie", a:"eine Krankheit", wrong:["eine Verletzung","eine Behinderung","ein Leiden"]},
+      {q:"une assurance maladie", a:"eine Krankenversicherung", wrong:["eine Haftpflichtversicherung","eine Rentenversicherung","eine Unfallversicherung"]},
+      {q:"une pharmacie", a:"eine Apotheke", wrong:["eine Drogerie","ein Sanitätshaus","ein Gesundheitszentrum"]},
+      {q:"rembourser qn de qc", a:"jemandem etwas erstatten", wrong:["jdm. etw. leihen","jdm. etw. schenken","jdm. etw. geben"]},
+      {q:"revoir qn", a:"jemanden wiedersehen", wrong:["jemanden kennenlernen","jemanden besuchen","jemanden treffen"]},
+      {q:"le Québec", a:"Quebec (Provinz im Osten Kanadas)", wrong:["Ontario","British Columbia","Alberta"]},
+      {q:"la francophonie", a:"die Frankofonie", wrong:["die Frankophonie","die Französischsprachigkeit","die Frankreichzone"]},
+      {q:"l'ensemble (m.)", a:"die Gesamtheit", wrong:["die Menge","die Gruppe","die Summe"]},
+      {q:"quotidien/quotidienne", a:"täglich", wrong:["wöchentlich","monatlich","jährlich"]},
+      {q:"francophone/francophone", a:"französischsprachig", wrong:["englischsprachig","zweisprachig","mehrsprachig"]},
+      {q:"une chaîne de télévision", a:"ein Fernsehsender", wrong:["ein Radiosender","ein Fernsehkanal","ein Programm"]},
+      {q:"un drapeau", a:"eine Flagge", wrong:["ein Banner","ein Symbol","ein Wappen"]},
+      {q:"un paysage", a:"eine Landschaft", wrong:["eine Aussicht","eine Natur","eine Umgebung"]},
+      {q:"énorme/énorme", a:"riesig", wrong:["groß","gewaltig","gigantisch"]},
+      {q:"le Canada", a:"Kanada", wrong:["Amerika","Australien","Neuseeland"]},
+      {q:"absolu/absolue", a:"absolut", wrong:["total","komplett","vollständig"]},
+      {q:"faire partie de qc", a:"zu etw. gehören", wrong:["etw. besitzen","etw. bilden","etw. darstellen"]},
+      {q:"l'Amérique (f.)", a:"Amerika", wrong:["Kanada","Südamerika","Nordamerika"]},
+      {q:"un territoire d'outre-mer", a:"ein Überseegebiet", wrong:["eine Kolonie","ein Protektorat","ein Bundesland"]},
+      {q:"un continent", a:"ein Kontinent", wrong:["ein Land","eine Region","ein Erdteil"]},
+      {q:"présent/présente", a:"anwesend", wrong:["abwesend","fehlend","weg"]},
+      {q:"la Belgique", a:"Belgien", wrong:["Luxemburg","die Niederlande","die Schweiz"]},
+      {q:"la Suisse", a:"die Schweiz", wrong:["Österreich","Liechtenstein","Belgien"]},
+      {q:"une province", a:"eine Provinz", wrong:["ein Staat","eine Region","ein Bezirk"]},
+      {q:"une langue maternelle", a:"eine Muttersprache", wrong:["eine Fremdsprache","eine Zweitsprache","eine Amtssprache"]},
+      {q:"l'Algérie (f.)", a:"Algerien", wrong:["Marokko","Tunesien","Libyen"]},
+      {q:"la Tunisie", a:"Tunesien", wrong:["Marokko","Algerien","Libyen"]},
+      {q:"l'arabe (m.)", a:"das Arabische", wrong:["das Berberische","das Tamazight","das Französische"]},
+      {q:"administratif/administrative", a:"behördlich", wrong:["politisch","staatlich","offiziell"]},
+      {q:"les médias (m. pl.)", a:"die Medien", wrong:["die Presse","die Zeitung","die Zeitschriften"]},
+      {q:"les Antilles (f. pl.)", a:"die Antillen (Inselgruppe in der Karibik)", wrong:["die Bermudas","die Bahamas","die Kanaren"]},
+      {q:"courant/courante", a:"fließend", wrong:["gut","perfekt","ausgezeichnet"]},
+      {q:"donc", a:"also", wrong:["deshalb","daher","folglich"]},
+      {q:"un rôle", a:"eine Rolle", wrong:["eine Aufgabe","eine Funktion","eine Position"]},
+      {q:"au cours de", a:"im Laufe einer Sache", wrong:["während","bei","in"]},
+      {q:"le Portugal", a:"Portugal", wrong:["Spanien","Brasilien","Italien"]},
+      {q:"une colonie", a:"eine Kolonie", wrong:["ein Territorium","ein Protektorat","ein Besitz"]},
+      {q:"un Français / une Française", a:"ein Franzose", wrong:["ein Frankokanadier","ein Belgier","ein Schweizer"]},
+      {q:"la richesse", a:"der Reichtum", wrong:["die Armut","das Vermögen","der Wohlstand"]},
+      {q:"indépendant/indépendante", a:"unabhängig", wrong:["abhängig","frei","autonom"]},
+      {q:"la Martinique", a:"Martinique (Insel in der Karibik)", wrong:["Guadeloupe","Réunion","Mayotte"]},
+      {q:"québécois/québécoise", a:"aus Quebec", wrong:["aus Montreal","aus Ottawa","aus Kanada"]},
+      {q:"un tiers de", a:"ein Drittel", wrong:["die Hälfte","ein Viertel","ein Fünftel"]},
+      {q:"total/totale", a:"vollständig", wrong:["teilweise","fast","ungefähr"]},
+    ]
   }
 ];
 
 // ===================== STATE =====================
 let currentSection = null;
-let allQuestions = [];       // all questions of the section (shuffled once)
-let questions = [];          // current round's questions
+let allQuestions = [];
+let questions = [];
 let qIndex = 0;
 let correctCount = 0;
 let wrongCount = 0;
@@ -953,11 +1112,10 @@ let quizDir = 'fr';
 let progress = {};
 let questionModes = [];
 
-// Retry / round state
 let roundNum = 1;
-let wrongInRound = [];       // indices of original questions answered wrong this round
-let roundLog = [];           // [{round, total, wrong}] for result screen
-let totalCorrectFirst = 0;   // correct on first attempt (for % score)
+let wrongInRound = [];
+let roundLog = [];
+let totalCorrectFirst = 0;
 
 // ===================== STORAGE =====================
 function loadProgress() {
@@ -1005,16 +1163,18 @@ function buildHome() {
       badgesHTML += `<span class="sc-badge ${cls}">Best: ${p.bestPct}%</span>`;
       if (p.lastWrong > 0) badgesHTML += `<span class="sc-badge errors">⚠ ${p.lastWrong} Fehler zuletzt</span>`;
     }
+    const isSchulaufgaben = s.id === 'schulaufgaben';
     const card = document.createElement('div');
-    card.className = 'section-card';
+    card.className = 'section-card' + (isSchulaufgaben ? ' schulaufgaben-card' : '');
     card.innerHTML = `
       <div class="sc-left">
-        <span class="sc-label">${s.label}</span>
+        <span class="sc-label" style="color:${s.color}">${s.label}</span>
         <span class="sc-name">${s.name}</span>
         <span class="sc-count">${s.questions.length} Vokabeln</span>
+        ${isSchulaufgaben ? '<span class="schulaufgaben-badge">📝 Schulaufgaben-Modus</span>' : ''}
         ${badgesHTML ? `<div class="sc-badges">${badgesHTML}</div>` : ''}
       </div>
-      <span class="arrow">→</span>`;
+      <span class="arrow" style="color:${s.color}">→</span>`;
     card.style.borderLeftColor = s.color;
     card.style.borderLeftWidth = '3px';
     card.onclick = () => startSection(s.id);
@@ -1061,12 +1221,12 @@ function updateRoundUI() {
   }
 }
 
-function showRetryBanner(show, wrongCount) {
+function showRetryBanner(show, wc) {
   const banner = document.getElementById('retryBanner');
   const content = document.getElementById('quizContent');
   if (show) {
     document.getElementById('retryTitle').textContent =
-      `${wrongCount} Vokabel${wrongCount !== 1 ? 'n' : ''} noch nicht sicher! 💪`;
+      `${wc} Vokabel${wc !== 1 ? 'n' : ''} noch nicht sicher! 💪`;
     document.getElementById('retrySub').textContent =
       `Diese kommen jetzt nochmal – weiter bis du alle kannst!`;
     banner.style.display = 'block';
@@ -1208,11 +1368,9 @@ function nextQuestion() {
 
 function endRound() {
   roundLog.push({ round: roundNum, total: questions.length, wrong: wrongInRound.length });
-
   if (wrongInRound.length === 0) {
     showResult();
   } else {
-    // prepare retry round
     showRetryBanner(true, wrongInRound.length);
   }
 }
@@ -1260,7 +1418,6 @@ function showResult() {
   document.getElementById('finalRounds').textContent = roundNum;
   document.getElementById('perfectBanner').className = isPerfect ? 'result-perfect-banner show' : 'result-perfect-banner';
 
-  // rounds detail
   const roundsEl = document.getElementById('resultRoundsDetail');
   if (roundNum === 1 && isPerfect) {
     roundsEl.innerHTML = `<div class="result-rounds-title">Rundendetails</div>
